@@ -52,12 +52,11 @@
     struct Achievement extends DbStructure{
         -<color:#CornflowerBlue>_id: int.next
         +name: str
-        -<color:#Salmon>_type: AchievementType
+        +<color:#Salmon>type: AchievementType
 
         +{static}create(str name, AchievementType type) -> Achievement
         +<color:#CornflowerBlue>{static}create_from_dict(object_dict:dict[str, Any]) -> Achievement
         +<color:#CornflowerBlue>id() -> int
-        +type() -> AchievementType
         +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
     }
         
