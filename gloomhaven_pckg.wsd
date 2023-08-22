@@ -10,9 +10,9 @@
     }
     
     abstract DbStructure {
-        +{abstract}{static}create_from_dict(object_dict: dict[str, Any] ) -> DbStructure 
+        +{abstract}{static}create_from_dict(object_dict: dict[str, Any], composing_dao: Any) -> DbStructure 
         +{abstract}to_dict() -> dict[str, Any]
-        +{abstract}get_key() -> Any
+        +{abstract}get_key_value() -> dict[str, Any]
     }
 
     class Scenario extends DbStructure{
@@ -28,7 +28,7 @@
         +id() -> int 
         +add_blocker(blocker: Requirement )
         +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
-        +<color:#CornflowerBlue>get_key() -> Any <<_id>>
+        +<color:#CornflowerBlue>get_key_value() -> Any <<_id>>
     } 
 
     struct Coordinates {
@@ -43,13 +43,12 @@
     class Requirement extends DbStructure {
         +achievement: Achievement 
         +is_done: bool 
-        +level: int|None 
-        +achievement: Achievement
+        +level: int|None
 
         +{static}create(achievement: Achievement, is_done: bool,level: int|None) -> Requirement
-        +<color:#CornflowerBlue>{static}create_from_dict(object_dict:dict[str, Any]) -> Requirement
+        +<color:#CornflowerBlue>{static}create_from_dict(object_dict:dict[str, Any], composing_daos: list[Any]) -> Requirement
         +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
-        +<color:#CornflowerBlue>get_key() -> Any <<whole_object>>
+        +<color:#CornflowerBlue>get_key_value() -> Any <<whole_object>>
     }
 
     class Achievement extends DbStructure{
@@ -61,7 +60,7 @@
         +<color:#CornflowerBlue>{static}create_from_dict(object_dict:dict[str, Any]) -> Achievement
         +id() -> int
         +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
-        +<color:#CornflowerBlue>get_key() -> Any <<_id>>
+        +<color:#CornflowerBlue>get_key_value() -> Any <<_id>>
     }
         
     Enum AchievementType <<enum>> {
