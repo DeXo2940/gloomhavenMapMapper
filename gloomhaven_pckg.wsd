@@ -10,7 +10,7 @@
 
         +{abstract}{static}create_from_dict(object_dict: dict[str, Any] ) -> DbStructure 
         +id() -> int
-        +to_dict() -> dict[str, Any]
+        +{abstract}to_dict() -> dict[str, Any]
     }
 
     struct Scenario extends DbStructure{
