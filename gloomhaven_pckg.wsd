@@ -99,12 +99,22 @@
         +save_all()
         +load_all()
     }
-   
+    
+
+    exception GloomhavenException <<Exception>>{
+        +message : str
+    }
+    exception CoordinatesException extends GloomhavenException
+    exception RequirementException extends GloomhavenException
+    
     'Dependency
     NoSQLDbAccess ..> DbStructure
        
     Achievement_DAO ..> Achievement
     Scenario_DAO ..> Scenario
+
+    Requirement ..> RequirementException : <<Throws>>
+    Coordinates ..> CoordinatesException : <<Throws>>
 
     NoSQLDbAccess --o Scenario_DAO
     NoSQLDbAccess --o Achievement_DAO
