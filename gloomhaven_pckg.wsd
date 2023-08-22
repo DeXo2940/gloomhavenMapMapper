@@ -1,0 +1,120 @@
+@startuml GloomhavenUML
+    hide empty members
+    skinparam {
+        linetype ortho
+        wrapWidth 260
+    }
+    
+    abstract DbStructure {
+        -_id: int
+
+        +{abstract}{static}create_from_dict(object_dict: dict[str, Any] ) -> DbStructure 
+        +id() -> int
+        +to_dict() -> dict[str, Any]
+    }
+
+    struct Scenario extends DbStructure{
+        -<color:#CornflowerBlue>_id: int
+        +coordinates: Coordinates
+        +name: str 
+        +blockers: list[Requirement]
+        +notes: str
+
+        +{static}create(int id, Coordinates coordinates, str name) -> Scenario
+        +{static}create_empty(id: int) -> Scenario
+        +<color:#CornflowerBlue>{static}create_from_dict(object_dict:dict[str, Any]) -> Scenario
+        +<color:#CornflowerBlue>id() -> int 
+        +add_blocker(blocker: Requirement )
+        +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+    } 
+
+    struct Coordinates {
+        +x: str
+        +y: int
+
+        +{static}create(str x, int y) -> Coordinates
+        +{static}create_by_string(str coordinates) -> Coordinates
+        +__str__() -> str
+    }
+
+    struct Requirement  {
+        ' -<color:#Red>_id: int
+        +achievement: Achievement 
+        +is_done: bool 
+        +level: int|None 
+        +achievement: Achievement
+
+        +{static}create(achievement: Achievement, is_done: bool,level: int|None) -> Requirement
+        ' +<color:#Red>id() -> int
+        ' +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+    }
+
+    struct Achievement extends DbStructure{
+        -<color:#CornflowerBlue>_id: int.next
+        +name: str
+        -<color:#Salmon>_type: AchievementType
+
+        +{static}create(str name, AchievementType type) -> Achievement
+        +<color:#CornflowerBlue>{static}create_from_dict(object_dict:dict[str, Any]) -> Achievement
+        +<color:#CornflowerBlue>id() -> int
+        +type() -> AchievementType
+        +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+    }
+        
+    Enum AchievementType <<enum>> {
+        **TEAM**
+        **GLOBAL**
+    }
+
+    interface NoSQLDbAccess{
+        +find(filter: filter)
+        +update_one(object: DatabaseObject)
+        +update_bulk(objects: list[DatabaseObject])
+    }
+
+    class MongoDbAccess implements NoSQLDbAccess{
+        +{static}create(document_name: str): MongoDbAccess
+        +<color:#BlueViolet>find(filter: filter)
+        +<color:#BlueViolet>update_one(object: DatabaseObject)
+        +<color:#BlueViolet>update_bulk(objects: list[DatabaseObject])
+    }
+
+    class Scenario_DAO <<singleton>> {
+        -_scenarios: list[Scenario]
+        
+        +{static}get_instance(db_access: NoSQLDbAccess) -> Scenario_DAO
+        +scenarios() -> list[Scenario]
+        +find_by_id() -> DbStructure
+        +save(scenario: Scenario)
+        +save_all()
+        +load_all()
+    }
+
+    class Achievement_DAO <<singleton>> {
+        -_achievements: list[Achievement]
+        
+        +{static}get_instance(db_access: NoSQLDbAccess) -> Achievement_DAO
+        +achievements() -> list[Achievement]
+        +find_by_id() -> DbStructure
+        +save(achievement: Achievement)
+        +save_all()
+        +load_all()
+    }
+   
+    'Dependency
+    NoSQLDbAccess ..> DbStructure
+       
+    Achievement_DAO ..> Achievement
+    Scenario_DAO ..> Scenario
+
+    NoSQLDbAccess --o Scenario_DAO
+    NoSQLDbAccess --o Achievement_DAO
+
+    Achievement o-- AchievementType
+
+    Scenario *-- Coordinates
+
+    Scenario  o-- "n" Requirement
+    Achievement --o Requirement
+
+@enduml
