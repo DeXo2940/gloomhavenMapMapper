@@ -3,18 +3,20 @@
     skinparam {
         linetype ortho
         wrapWidth 260
+        ' default 60, line length
+        ranksep 30
+        ' default 35, separation of boxes
+        nodesep 35
     }
     
     abstract DbStructure {
-        -_id: int
-
         +{abstract}{static}create_from_dict(object_dict: dict[str, Any] ) -> DbStructure 
-        +id() -> int
         +{abstract}to_dict() -> dict[str, Any]
+        +{abstract}get_key() -> Any
     }
 
-    struct Scenario extends DbStructure{
-        -<color:#CornflowerBlue>_id: int
+    class Scenario extends DbStructure{
+        -_id: int
         +coordinates: Coordinates
         +name: str 
         +blockers: list[Requirement]
@@ -23,9 +25,10 @@
         +{static}create(int id, Coordinates coordinates, str name) -> Scenario
         +{static}create_empty(id: int) -> Scenario
         +<color:#CornflowerBlue>{static}create_from_dict(object_dict:dict[str, Any]) -> Scenario
-        +<color:#CornflowerBlue>id() -> int 
+        +id() -> int 
         +add_blocker(blocker: Requirement )
         +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+        +<color:#CornflowerBlue>get_key() -> Any <<_id>>
     } 
 
     struct Coordinates {
@@ -37,27 +40,28 @@
         +__str__() -> str
     }
 
-    struct Requirement  {
-        ' -<color:#Red>_id: int
+    class Requirement extends DbStructure {
         +achievement: Achievement 
         +is_done: bool 
         +level: int|None 
         +achievement: Achievement
 
         +{static}create(achievement: Achievement, is_done: bool,level: int|None) -> Requirement
-        ' +<color:#Red>id() -> int
-        ' +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+        +<color:#CornflowerBlue>{static}create_from_dict(object_dict:dict[str, Any]) -> Requirement
+        +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+        +<color:#CornflowerBlue>get_key() -> Any <<whole_object>>
     }
 
-    struct Achievement extends DbStructure{
-        -<color:#CornflowerBlue>_id: int.next
+    class Achievement extends DbStructure{
+        -_id: int.next
         +name: str
         +<color:#Salmon>type: AchievementType
 
         +{static}create(str name, AchievementType type) -> Achievement
         +<color:#CornflowerBlue>{static}create_from_dict(object_dict:dict[str, Any]) -> Achievement
-        +<color:#CornflowerBlue>id() -> int
+        +id() -> int
         +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+        +<color:#CornflowerBlue>get_key() -> Any <<_id>>
     }
         
     Enum AchievementType <<enum>> {
@@ -99,13 +103,13 @@
         +save_all()
         +load_all()
     }
-    
 
     exception GloomhavenException <<Exception>>{
         +message : str
     }
     exception CoordinatesException extends GloomhavenException
     exception RequirementException extends GloomhavenException
+    exception ScenarioException extends GloomhavenException
     
     'Dependency
     NoSQLDbAccess ..> DbStructure
@@ -115,15 +119,19 @@
 
     Requirement ..> RequirementException : <<Throws>>
     Coordinates ..> CoordinatesException : <<Throws>>
+    Scenario ..> ScenarioException : <<Throws>>
 
     NoSQLDbAccess --o Scenario_DAO
     NoSQLDbAccess --o Achievement_DAO
 
     Achievement o-- AchievementType
+    ' AchievementType --o Achievement
 
     Scenario *-- Coordinates
+    ' Coordinates --* Scenario
 
-    Scenario  o-- "n" Requirement
-    Achievement --o Requirement
+    Scenario  o- "n" Requirement
+    Requirement o- Achievement
+    ' Achievement --o Requirement
 
 @enduml
