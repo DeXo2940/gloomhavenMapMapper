@@ -69,13 +69,13 @@
         **GLOBAL**
     }
 
-    interface NoSQLDbAccess{
+    interface DbAccess{
         +find(filter: filter)
         +update_one(object: DatabaseObject)
         +update_bulk(objects: list[DatabaseObject])
     }
 
-    class MongoDbAccess implements NoSQLDbAccess{
+    class MongoDbAccess implements DbAccess{
         +{static}create(document_name: str): MongoDbAccess
         +<color:#BlueViolet>find(filter: filter)
         +<color:#BlueViolet>update_one(object: DatabaseObject)
@@ -85,7 +85,7 @@
     class Scenario_DAO <<singleton>> {
         -_scenarios: list[Scenario]
         
-        +{static}get_instance(db_access: NoSQLDbAccess) -> Scenario_DAO
+        +{static}get_instance(db_access: DbAccess) -> Scenario_DAO
         +scenarios() -> list[Scenario]
         +find_by_id() -> DbStructure
         +save(scenario: Scenario)
@@ -96,7 +96,7 @@
     class Achievement_DAO <<singleton>> {
         -_achievements: list[Achievement]
         
-        +{static}get_instance(db_access: NoSQLDbAccess) -> Achievement_DAO
+        +{static}get_instance(db_access: DbAccess) -> Achievement_DAO
         +achievements() -> list[Achievement]
         +find_by_id() -> DbStructure
         +save(achievement: Achievement)
@@ -112,7 +112,7 @@
     exception ScenarioException extends GloomhavenException
     
     'Dependency
-    NoSQLDbAccess ..> DbStructure
+    DbAccess ..> DbStructure
        
     Achievement_DAO ..> Achievement
     Scenario_DAO ..> Scenario
@@ -121,8 +121,8 @@
     Coordinates ..> CoordinatesException : <<Throws>>
     Scenario ..> ScenarioException : <<Throws>>
 
-    NoSQLDbAccess --o Scenario_DAO
-    NoSQLDbAccess --o Achievement_DAO
+    DbAccess --o Scenario_DAO
+    DbAccess --o Achievement_DAO
 
     Achievement o-- AchievementType
     ' AchievementType --o Achievement
