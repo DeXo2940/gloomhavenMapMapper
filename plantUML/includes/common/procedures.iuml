@@ -1,0 +1,16 @@
+
+!procedure $singleton()
+    <size:8>//**[singleton]**//</size>
+!endprocedure
+
+!procedure $implementation()
+    +<color:#CornflowerBlue>
+!endprocedure
+!procedure $optional($param)
+//optional_parameter//
+!endprocedure
+
+!procedure $throws($class, $exception)
+    $class ..> $exception : <<Throws>>
+!endprocedure
+ 

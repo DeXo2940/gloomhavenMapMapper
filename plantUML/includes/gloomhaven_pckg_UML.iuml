@@ -1,0 +1,5 @@
+!include common/skinparams.iuml
+!include common/legend.iuml
+
+!include db_pckg.iuml
+!include gloomhaven_pckg.iuml

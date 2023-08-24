@@ -1,0 +1,16 @@
+!include procedures.iuml
+class Legend << (L, Orange) >>{
+    $singleton()
+    **CONSTANT**
+    +public_atribute: type_of_the_attribute
+    -_private_atribute
+    #private_atribute with getter only
+    --
+    +{static}static_method()
+    ..//self// is ommited in methods..
+    +method(parameter: parameter_type) -> return_value: return_value_type
+    $implementation()method_implementation_or_refdefinition_from_interface_or_abstract_class()
+    +method2($optional(optional_parameter))
+    
+    +{abstract}abstract_method()
+}

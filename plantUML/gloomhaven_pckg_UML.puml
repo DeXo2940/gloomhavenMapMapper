@@ -1,0 +1,5 @@
+@startuml GloomhavenUML
+    !include includes/gloomhaven_pckg_UML.iuml
+
+    hide <<db_pckg>> members
+@enduml

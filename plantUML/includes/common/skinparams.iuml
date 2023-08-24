@@ -1,0 +1,10 @@
+hide empty members
+skinparam {
+    linetype ortho
+    wrapWidth 260
+    ' default 60, line length
+    ' ranksep 40
+    ' default 35, separation of boxes
+    ' nodesep 45
+}
+
