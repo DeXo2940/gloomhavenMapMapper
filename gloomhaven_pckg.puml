@@ -1,0 +1,132 @@
+@startuml GloomhavenUML
+    !include commons.wsd!
+
+
+    package db_pckg{
+        'Can I import it and use some fancy [hidden]???
+        class DbSingleFilter
+        abstract DbFilter
+        interface DbAccess
+        abstract DbStructure 
+        abstract UniqueKeyDbStructure extends DbStructure
+               
+        DbAccess ..> DbStructure
+        
+        ' DbFilter o-- DbSingleFilter
+        DbSingleFilter --o  DbFilter
+        
+        DbStructure ..> DbFilter
+    }
+
+    package gloomhaven_pckg{
+        class Scenario extends UniqueKeyDbStructure{
+            +coordinates: Coordinates
+            +name: str 
+            +blockers: list[Requirement]
+            +notes: str
+
+            +{static}create(int id, Coordinates coordinates, str name) -> Scenario
+            +{static}create_empty(id: int) -> Scenario
+            +create_from_dict(object_dict:dict[str, Any]) -> Scenario
+            +add_blocker(blocker: Requirement ) -> None
+            +remove_blocker(self, blocker: Requirement) -> None
+            +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+        } 
+
+        struct Coordinates {
+            +x: str
+            +y: int
+
+            +{static}create(str x, int y) -> Coordinates
+            +{static}create_by_string(str coordinates) -> Coordinates
+            +__str__() -> str
+        }
+
+        class Requirement extends DbStructure {
+            +achievement: Achievement 
+            +is_done: bool 
+            +level: int|None
+
+            +{static}create(achievement: Achievement, is_done: bool,level: int|None) -> Requirement
+            +{static}create_from_dict(object_dict:dict[str, Any], composing_daos: AchievementDAO) -> Requirement
+            +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+            +<color:#CornflowerBlue>get_key_value() -> DbFilter <<whole_object>>
+        }
+
+        class Achievement extends UniqueKeyDbStructure{
+            +name: str
+            +type: AchievementType
+
+            +{static}create(name: str, type: AchievementType) -> Achievement
+            +{static}create_from_dict(object_dict:dict[str, Any]) -> Achievement
+            +<color:#CornflowerBlue>to_dict() -> dict[str, Any]
+        }
+            
+        Enum AchievementType <<enum>> {
+            **TEAM**
+            **GLOBAL**
+        }
+
+        class ScenarioDAO <<singleton>> {
+            **COLLECTION_NAME** = Scenario
+            -_scenarios: list[Scenario]
+            -_db_access: DbAccess
+            
+            +{static}get_instance(db_access: DbAccess) -> ScenarioDAO
+            +scenarios() -> list[Scenario]
+            +find_by_id() -> DbStructure
+            +save(scenario: Scenario)
+            +save_all()
+            +load_all()
+        }
+
+        class AchievementDAO <<singleton>> {
+            **COLLECTION_NAME** = Achievement
+            -_achievements: list[Achievement]
+            -_db_access: DbAccess
+            
+            +{static}get_instance(db_access: DbAccess) -> AchievementDAO
+            +achievements() -> list[Achievement]
+            +find_by_id() -> DbStructure
+            +save(achievement: Achievement)
+            +save_all()
+            +load_all()
+        }
+
+        ' Exceptions
+        together {
+            exception GloomhavenException <<Exception>>{
+                +message : str
+            }
+            exception CoordinatesException extends GloomhavenException
+            exception ScenarioException extends GloomhavenException
+            exception RequirementException extends GloomhavenException
+
+            Requirement ..> RequirementException : <<Throws>>
+            Coordinates ..> CoordinatesException : <<Throws>>
+            Scenario ..> ScenarioException : <<Throws>>
+        }
+
+        'Dependency
+        AchievementDAO ..> Achievement : <<Saves,Loads>>
+        ScenarioDAO ..> Scenario : <<Saves,Loads>>
+
+        DbAccess --o ScenarioDAO
+        DbAccess --o AchievementDAO
+
+        Achievement o- AchievementType
+        ' AchievementType -o Achievement
+
+        Scenario *-- Coordinates
+        ' Coordinates --* Scenario
+
+        Scenario "1" o- "n" Requirement
+        Requirement o- Achievement
+        ' Achievement --o Requirement
+
+        ' hidden lines for aesthetics only
+        Achievement -[hidden]- GloomhavenException
+
+    }
+
+@enduml
