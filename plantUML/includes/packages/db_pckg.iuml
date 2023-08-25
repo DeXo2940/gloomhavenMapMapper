@@ -1,5 +1,5 @@
 
-!include common/procedures.iuml
+!include ../common/procedures.iuml
 
 package db_pckg{
     enum DbFilterOperator <<db_pckg>>{
@@ -46,8 +46,10 @@ package db_pckg{
     interface DbAccess<<db_pckg>>{
         +{abstract}find_single(key: DbFilter) -> dict[str, Any]
         +{abstract}find(filter: DbFilter|None) -> list[dict[str, Any]]
-        +{abstract}update_one(object: DbStructure) -> None
+        +{abstract}update(object: DbStructure) -> None
         +{abstract}update_bulk(objects: list[DbStructure]) -> None
+        +{abstract}delete(object: DbStructure) -> None
+        +{abstract}delete_bulk(objects: list[DbStructure]) -> None
     }
     class MongoDbAccess<<db_pckg>> implements DbAccess{
         -_client: MongoClient
@@ -57,8 +59,10 @@ package db_pckg{
         +{static}create(connection_string: str, database_name: str, colection_name: str, $optional("timeout_ms: int"), $optional("test_timeout_ms: int"), $optional("connection_retries: int")) -> MongoDbAccess
         $implementation()find_single(key: DbFilter) -> dict[str, Any]
         $implementation()find(filter: DbFilter|None) -> list[dict[str, Any]]
-        $implementation()update_one(object: DbStructure) -> None
+        $implementation()update(object: DbStructure) -> None
         $implementation()update_bulk(objects: list[DbStructure]) -> None
+        $implementation()delete(object: DbStructure) -> None
+        $implementation()delete_bulk(objects: list[DbStructure]) -> None
     }
     interface DbStructure<<db_pckg>>{
         +{abstract}to_dict() -> dict[str, Any]

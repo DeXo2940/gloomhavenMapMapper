@@ -1,5 +1,3 @@
 @startuml DbPckgUML
-    !include includes/common/skinparams.iuml
-    !include includes/common/legend.iuml
-    !include includes/db_pckg.iuml
+    !include includes/db_pckg_UML.iuml
 @enduml

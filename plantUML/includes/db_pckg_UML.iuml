@@ -1,0 +1,4 @@
+
+!include common/skinparams.iuml
+!include common/legend.iuml
+!include packages/db_pckg.iuml

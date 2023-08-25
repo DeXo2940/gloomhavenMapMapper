@@ -1,4 +1,6 @@
-!include common/procedures.iuml
+
+!include ../common/procedures.iuml
+
 package gloomhaven_pckg{
     class Scenario<<gloomhaven_pckg>>  extends UniqueKeyDbStructure{
         +coordinates: Coordinates
