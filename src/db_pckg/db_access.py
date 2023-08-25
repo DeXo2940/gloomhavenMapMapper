@@ -11,7 +11,7 @@ class DbAccess(ABC):
         pass
 
     @abstractmethod
-    def find(self, filter: DbFilter | None) -> list[dict[str, Any]]:
+    def find(self, filter: DbFilter | None = None) -> list[dict[str, Any]]:
         pass
 
     @abstractmethod
