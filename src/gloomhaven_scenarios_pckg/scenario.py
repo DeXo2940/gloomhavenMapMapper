@@ -29,7 +29,7 @@ class Scenario(UniqueKeyDbStructure):
 
     @staticmethod
     def create_from_dict(
-        object_dict: dict[str, Any], composing_dao: AchievementDAO
+        object_dict: dict[str, Any], achievement_dao: AchievementDAO
     ) -> Scenario:
         id = object_dict.get("_id")
         if id is None:
@@ -53,7 +53,7 @@ class Scenario(UniqueKeyDbStructure):
             scenario_blockers = blockers
 
         for blocker in scenario_blockers:
-            scenario_blocker = Requirement.create_from_dict(blocker, composing_dao)
+            scenario_blocker = Requirement.create_from_dict(blocker, achievement_dao)
             scenario.add_blocker(scenario_blocker)
 
         return scenario
