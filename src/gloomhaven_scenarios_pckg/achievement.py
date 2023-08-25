@@ -59,3 +59,6 @@ class Achievement(UniqueKeyDbStructure):
             "name": self._name,
             "type": self._type.name,
         }
+
+    def __repr__(self) -> str:
+        return str(self.to_dict())

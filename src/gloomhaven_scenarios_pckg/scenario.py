@@ -113,3 +113,6 @@ class Scenario(UniqueKeyDbStructure):
             "notes": self._notes,
         }
         return result
+
+    def __repr__(self) -> str:
+        return str(self.to_dict())
