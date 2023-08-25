@@ -45,7 +45,7 @@ package db_pckg{
 
     interface DbAccess<<db_pckg>>{
         +{abstract}find_single(key: DbFilter) -> dict[str, Any]
-        +{abstract}find(filter: DbFilter|None) -> list[dict[str, Any]]
+        +{abstract}find($optional("filter: DbFilter|None")) -> list[dict[str, Any]]
         +{abstract}update(object: DbStructure) -> None
         +{abstract}update_bulk(objects: list[DbStructure]) -> None
         +{abstract}delete(object: DbStructure) -> None
@@ -58,7 +58,7 @@ package db_pckg{
 
         +{static}create(connection_string: str, database_name: str, colection_name: str, $optional("timeout_ms: int"), $optional("test_timeout_ms: int"), $optional("connection_retries: int")) -> MongoDbAccess
         $implementation()find_single(key: DbFilter) -> dict[str, Any]
-        $implementation()find(filter: DbFilter|None) -> list[dict[str, Any]]
+        $implementation()find($optional("filter: DbFilter|None")) -> list[dict[str, Any]]
         $implementation()update(object: DbStructure) -> None
         $implementation()update_bulk(objects: list[DbStructure]) -> None
         $implementation()delete(object: DbStructure) -> None

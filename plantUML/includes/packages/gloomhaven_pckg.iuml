@@ -53,29 +53,25 @@ package gloomhaven_pckg{
     class ScenarioDAO <<gloomhaven_pckg>> {
         $singleton()
         **COLLECTION_NAME** = Scenario
-        -_scenarios: list[Scenario]
         -_db_access: DbAccess
         
         +{static}get_instance(db_access: DbAccess) -> ScenarioDAO
-        +scenarios() -> list[Scenario]
         +find_by_id() -> DbStructure
-        +save(scenario: Scenario)
-        +save_all()
-        +load_all()
+        +find_all() -> list[Scenario]
+        +save_one(scenario: Scenario) -> None
+        +save_many(scenarios: list[Scenario]) -> None
     }
 
     class AchievementDAO<<gloomhaven_pckg>>{
         $singleton()
         **COLLECTION_NAME** = Achievement
-        -_achievements: list[Achievement]
         -_db_access: DbAccess
         
         +{static}get_instance(db_access: DbAccess) -> AchievementDAO
-        +achievements() -> list[Achievement]
         +find_by_id() -> DbStructure
-        +save(achievement: Achievement)
-        +save_all()
-        +load_all()
+        +find_all() -> list[Achievement]
+        +save_one(achievement: Achievement) -> None
+        +save_many(achievements: list[Achievement]) -> None
     }
 
     ' Exceptions

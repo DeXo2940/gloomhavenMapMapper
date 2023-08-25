@@ -10,7 +10,6 @@ class Legend << (L, Orange) >>{
     ..//self// is ommited in methods..
     +method(parameter: parameter_type) -> return_value: return_value_type
     $implementation()method_implementation_or_refdefinition_from_interface_or_abstract_class()
-    +method2($optional(optional_parameter))
-    
+    +method2($optional("optional_parameter"))
     +{abstract}abstract_method()
 }
