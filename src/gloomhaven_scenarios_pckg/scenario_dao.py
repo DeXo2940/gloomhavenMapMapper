@@ -10,7 +10,7 @@ from db_pckg import (
     DbFilterOperator,
     DbStructure,
 )
-from gloomhaven_scenarios_pckg.achievement import Achievement
+from .achievement import Achievement
 from .achievement_dao import AchievementDAO
 from .requirement import Requirement
 from .scenario import Scenario
@@ -52,7 +52,9 @@ class ScenarioDAO:
         db_structures = self._translate_scenarios_to_dbstructures(scenarios)
         self._db_access.update_bulk(db_structures)
 
-    def _translate_scenarios_to_dbstructures(self, scenarios: list[Scenario]):
+    def _translate_scenarios_to_dbstructures(
+        self, scenarios: list[Scenario]
+    ) -> list[DbStructure]:
         # for some reason when Scenario is in list the IDE shows a type error
         db_structures: list[DbStructure] = []
         for scenario in scenarios:

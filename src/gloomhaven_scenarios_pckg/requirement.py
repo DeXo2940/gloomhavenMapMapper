@@ -29,7 +29,7 @@ class Requirement(DbStructure):
 
     @staticmethod
     def create_from_dict(
-        object_dict: dict[str, Any], composing_dao: AchievementDAO
+        object_dict: dict[str, Any], achievement_dao: AchievementDAO
     ) -> Requirement:
         is_done = bool(object_dict.get("is_done"))
         level = object_dict.get("level")
@@ -39,8 +39,7 @@ class Requirement(DbStructure):
             raise RequirementException("Incorrect achievement Id")
         achievement_id = int(achievement_id)
 
-        # TODO FIX THIS SHIT - I Need the DAO...
-        achievement = composing_dao.get_by_id(achievement_id)
+        achievement = achievement_dao.find_by_id(achievement_id)
         if achievement is None:
             raise RequirementException(
                 f"Couldn't find an achievement with id: {achievement_id}"

@@ -105,14 +105,13 @@ class Scenario(UniqueKeyDbStructure):
         self._blockers.remove(blocker)
 
     def to_dict(self) -> dict[str, Any]:
-        result: dict[str, Any] = {
+        return {
             "_id": self._id,
             "coords": str(self._coordinates),
             "name": self._name,
             "blockers": [blocker.to_dict() for blocker in self._blockers],
             "notes": self._notes,
         }
-        return result
 
     def __repr__(self) -> str:
         return str(self.to_dict())
