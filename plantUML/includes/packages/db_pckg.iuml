@@ -89,6 +89,7 @@ package db_pckg{
         $throws(MongoConnectionTester, DbException)
         $throws(MognoDbFilter, DbException)
         $throws(DbSingleFilter, DbException)
+        $throws(MongoDbAccess, DbException)
         
         hide <<db_pckg>> stereotype
     }

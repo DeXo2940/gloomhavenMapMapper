@@ -14,6 +14,7 @@ package gloomhaven_pckg{
         +add_blocker(blocker: Requirement ) -> None
         +remove_blocker(self, blocker: Requirement) -> None
         $implementation()to_dict() -> dict[str, Any]
+        +__repr__() -> str:
     } 
 
     struct Coordinates<<gloomhaven_pckg>>{
@@ -43,6 +44,7 @@ package gloomhaven_pckg{
         +{static}create(name: str, type: AchievementType) -> Achievement
         +{static}create_from_dict(object_dict:dict[str, Any]) -> Achievement
         $implementation()to_dict() -> dict[str, Any]
+        +__repr__() -> str:
     }
         
     Enum AchievementType<<gloomhaven_pckg>>{
