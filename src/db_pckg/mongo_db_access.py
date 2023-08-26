@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any
 
 import pymongo
+import pymongo.errors as pymongo_error
 import pymongo.collection as pymongo_coll
 import pymongo.database as pymongo_db
 
@@ -16,7 +17,7 @@ from .mongo_connection_tester import MongoConnectionTester
 
 class MongoDbAccess(DbAccess):
     TEST_TIMEOUT_MS = 100
-    TIMEOUT_MS = 20_000
+    TIMEOUT_MS = 5_000
 
     def __init__(
         self,
@@ -59,42 +60,59 @@ class MongoDbAccess(DbAccess):
     def find_single(self, key: DbFilter) -> dict[str, Any]:
         mongo_key = self._translate_to_mongo_filter(key)
         key_dict = mongo_key.translate_for_db()
-        record = self._collection.find_one(key_dict)
-        return record if record != None else {}
+        try:
+            record = self._collection.find_one(key_dict)
+            return record if record != None else {}
+        except pymongo_error.ServerSelectionTimeoutError:
+            raise DbException("Server Database Timeout")
 
     def find(self, filter: DbFilter | None = None) -> list[dict[str, Any]]:
-        if filter is None:
-            return list(self._collection.find())
-        mongo_filter = self._translate_to_mongo_filter(filter)
-        filter_dict = mongo_filter.translate_for_db()
+        try:
+            if filter is None:
+                records = self._collection.find()
+                return list(records)
+            mongo_filter = self._translate_to_mongo_filter(filter)
+            filter_dict = mongo_filter.translate_for_db()
 
-        return list(self._collection.find(filter_dict))
+            records = self._collection.find(filter_dict)
+            return list(records)
+        except pymongo_error.ServerSelectionTimeoutError:
+            raise DbException("Server Database Timeout")
 
     def update(self, object: DbStructure) -> None:
         key_filter = self._get_object_key_dict(object)
         object_dict = self._get_cleaned_dict(object)
-
-        self._collection.replace_one(key_filter, object_dict, True)
+        try:
+            self._collection.replace_one(key_filter, object_dict, True)
+        except pymongo_error.ServerSelectionTimeoutError:
+            raise DbException("Server Database Timeout")
 
     def update_bulk(self, objects: list[DbStructure]) -> None:
         bulk_operations = []
         for object in objects:
             replace_one = self._get_replace_one_for_bulk(object)
             bulk_operations.append(replace_one)
-
-        self._collection.bulk_write(bulk_operations)
+        try:
+            self._collection.bulk_write(bulk_operations)
+        except pymongo_error.ServerSelectionTimeoutError:
+            raise DbException("Server Database Timeout")
 
     def delete(self, object: DbStructure) -> None:
         key_filter = self._get_object_key_dict(object)
-        self._collection.delete_one(key_filter)
+        try:
+            self._collection.delete_one(key_filter)
+        except pymongo_error.ServerSelectionTimeoutError:
+            raise DbException("Server Database Timeout")
 
     def delete_bulk(self, objects: list[DbStructure]) -> None:  # TODO implement
         bulk_operations = []
         for object in objects:
             delete_one = self._get_delete_one_for_bulk(object)
             bulk_operations.append(delete_one)
-
-        self._collection.bulk_write(bulk_operations)
+        try:
+            self._collection.bulk_write(bulk_operations)
+        except pymongo_error.ServerSelectionTimeoutError:
+            raise DbException("Server Database Timeout")
 
     def _translate_to_mongo_filter(self, filter: DbFilter) -> MognoDbFilter:
         return (
