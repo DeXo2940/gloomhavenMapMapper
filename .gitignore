@@ -1,5 +1,6 @@
 # Don't store data in the project
 mongo/
+maria-db/
 # Don't store the UMLs
 out/
 
