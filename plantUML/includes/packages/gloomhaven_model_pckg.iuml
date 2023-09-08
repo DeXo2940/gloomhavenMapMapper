@@ -3,6 +3,7 @@
 
 package peewee <<Node>> {
     class Model <<peewee>> 
+    class Database <<peewee>>
 
     hide <<peewee>> stereotype
     hide <<peewee>> members
@@ -16,6 +17,7 @@ package gloomhaven_model_pckg{
         database: peewee.Database
     }
     $nested(BaseModel, meta_base_model)
+    meta_base_model --> peewee.Database
 
     class Scenario <<gloomhaven_model_pckg>> extends BaseModel{
         $primary_key("id: int")
@@ -39,6 +41,9 @@ package gloomhaven_model_pckg{
         primary_key: peewee.CompositeKey
     }
     $nested(Restriction, meta_restriction)
+
+    Restriction .. Scenario
+    Restriction .. Achievement
     
     hide <<gloomhaven_model_pckg>> stereotype
 }

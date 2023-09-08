@@ -49,11 +49,9 @@ package gloomhaven_pckg{
         **GLOBAL**
     }
 
-
     class ScenarioRepository<<gloomhaven_pckg>>{
         $singleton()
         +language: str
-        -_achievement_repository: AchievementRepository
         
         +{static}get_instance() -> ScenarioRepository
         +create(scenario: Scenario, achievement_repository: AchievementRepository) -> Scenario
@@ -84,10 +82,12 @@ package gloomhaven_pckg{
         exception CoordinatesException extends GloomhavenException
         exception ScenarioException extends GloomhavenException
         exception RequirementException extends GloomhavenException
+        exception AchievementException extends GloomhavenException
 
         $throws(Requirement, RequirementException)
         $throws(Coordinates, CoordinatesException)
         $throws(Scenario, ScenarioException)
+        $throws(Achievement, AchievementException)
 
         hide <<gloomhaven_pckg>> stereotype
     }
@@ -104,12 +104,9 @@ package gloomhaven_pckg{
     Scenario *-- Coordinates
     
     ScenarioRepository ..> gloomhaven_model_pckg.Scenario
-    ScenarioRepository ..> gloomhaven_model_pckg.ScenarioName
-    ScenarioRepository ..> gloomhaven_model_pckg.ScenarioNotes
     ScenarioRepository ..> gloomhaven_model_pckg.Restriction
-    
+
     AchievementRepository ..> gloomhaven_model_pckg.Achievement
-    AchievementRepository ..> gloomhaven_model_pckg.AchievementName
 
     ' ' hidden lines for aesthetics only
     ' Achievement -[hidden]- GloomhavenException
