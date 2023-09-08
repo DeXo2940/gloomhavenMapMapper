@@ -22,11 +22,6 @@ package gloomhaven_model_pckg{
         $index("name: str")
         coordinates: str
     }
-
-    class ScenarioNotes <<gloomhaven_model_pckg>> extends BaseModel{
-        $foreign_key("id: Scenario.id") 
-        notes: str
-    }
     
     class Achievement <<gloomhaven_model_pckg>> extends BaseModel{
         $primary_key("id: int")
