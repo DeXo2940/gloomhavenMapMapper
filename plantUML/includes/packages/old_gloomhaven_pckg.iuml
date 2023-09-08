@@ -1,12 +1,8 @@
 
 !include ../common/procedures.iuml
 
-package gloomhaven_model_pckg{}
-
 package gloomhaven_pckg{
-    
-    class Scenario<<gloomhaven_pckg>>{
-        #id: int
+    class Scenario<<gloomhaven_pckg>>  extends UniqueKeyDbStructure{
         +coordinates: Coordinates
         +name: str 
         +blockers: list[Requirement]
@@ -14,9 +10,11 @@ package gloomhaven_pckg{
 
         +{static}create(int id, Coordinates coordinates, str name) -> Scenario
         +{static}create_empty(id: int) -> Scenario
-        
+        +create_from_dict(object_dict:dict[str, Any]) -> Scenario
         +add_blocker(blocker: Requirement ) -> None
         +remove_blocker(self, blocker: Requirement) -> None
+        $implementation()to_dict() -> dict[str, Any]
+        +__repr__() -> str:
     } 
 
     struct Coordinates<<gloomhaven_pckg>>{
@@ -28,20 +26,25 @@ package gloomhaven_pckg{
         +__str__() -> str
     }
 
-    class Requirement<<gloomhaven_pckg>>{
+    class Requirement<<gloomhaven_pckg>> extends DbStructure{
         +achievement: Achievement 
         +is_done: bool 
         +level: int|None
 
         +{static}create(achievement: Achievement, is_done: bool,level: int|None) -> Requirement
+        +{static}create_from_dict(object_dict:dict[str, Any], composing_daos: AchievementDAO) -> Requirement
+        $implementation()to_dict() -> dict[str, Any]
+        $implementation()get_key_value() -> DbFilter [whole_object]
     }
 
-    class Achievement<<gloomhaven_pckg>>{
-        #id: int
+    class Achievement<<gloomhaven_pckg>> extends UniqueKeyDbStructure{
         +name: str
         +type: AchievementType
 
         +{static}create(name: str, type: AchievementType) -> Achievement
+        +{static}create_from_dict(object_dict:dict[str, Any]) -> Achievement
+        $implementation()to_dict() -> dict[str, Any]
+        +__repr__() -> str:
     }
         
     Enum AchievementType<<gloomhaven_pckg>>{
@@ -49,31 +52,32 @@ package gloomhaven_pckg{
         **GLOBAL**
     }
 
-
-    class ScenarioRepository<<gloomhaven_pckg>>{
+    class ScenarioDAO <<gloomhaven_pckg>> {
         $singleton()
-        +language: str
-        -_achievement_repository: AchievementRepository
+        **COLLECTION_NAME** = Scenario
+        -_scenarios: list[Scenario]
+        -_db_access: DbAccess
         
-        +{static}get_instance() -> ScenarioRepository
-        +create(scenario: Scenario, achievement_repository: AchievementRepository) -> Scenario
-        +read() -> list[Scenario]
-        +read_by_id(id: int) -> Scenario
-        +update(scenario: Scenario) -> Scenario
-        +delete(scenario: Scenario) -> None
+        +{static}get_instance(db_access: DbAccess) -> ScenarioDAO
+        +scenarios() -> list[Scenario]
+        +find_by_id() -> DbStructure
+        +save(scenario: Scenario)
+        +save_all()
+        +load_all()
     }
 
-    class AchievementRepository<<gloomhaven_pckg>>{
+    class AchievementDAO<<gloomhaven_pckg>>{
         $singleton()
-        +language: str
+        **COLLECTION_NAME** = Achievement
+        -_achievements: list[Achievement]
+        -_db_access: DbAccess
         
-        +{static}get_instance() -> AchievementRepository
-        +create(achievement: Achievement) -> Achievement
-        +read() -> list[Achievement]
-        +read_by_id(id: int) -> Achievement
-        +read_by_name(name: str) -> Achievement
-        +update(achievement: Achievement) -> Achievement
-        +delete(achievement: Achievement) -> None
+        +{static}get_instance(db_access: DbAccess) -> AchievementDAO
+        +achievements() -> list[Achievement]
+        +find_by_id() -> DbStructure
+        +save(achievement: Achievement)
+        +save_all()
+        +load_all()
     }
 
     ' Exceptions
@@ -85,6 +89,7 @@ package gloomhaven_pckg{
         exception ScenarioException extends GloomhavenException
         exception RequirementException extends GloomhavenException
 
+
         $throws(Requirement, RequirementException)
         $throws(Coordinates, CoordinatesException)
         $throws(Scenario, ScenarioException)
@@ -93,26 +98,20 @@ package gloomhaven_pckg{
     }
 
     'Dependency
-    ScenarioRepository ..> Scenario
-    ScenarioRepository ..> AchievementRepository
-    AchievementRepository ..> Achievement
-    
+    AchievementDAO ..> Achievement : <<Saves,Loads>>
+    ScenarioDAO ..> Scenario : <<Saves,Loads>>
     Scenario "1" o- "n" Requirement
     Requirement o- Achievement
 
     Achievement o- AchievementType
     Scenario *-- Coordinates
     
-    ScenarioRepository ..> gloomhaven_model_pckg.Scenario
-    ScenarioRepository ..> gloomhaven_model_pckg.ScenarioName
-    ScenarioRepository ..> gloomhaven_model_pckg.ScenarioNotes
-    ScenarioRepository ..> gloomhaven_model_pckg.Restriction
-    
-    AchievementRepository ..> gloomhaven_model_pckg.Achievement
-    AchievementRepository ..> gloomhaven_model_pckg.AchievementName
+    'From db_pckg
+    DbAccess --o ScenarioDAO
+    DbAccess --o AchievementDAO
 
-    ' ' hidden lines for aesthetics only
-    ' Achievement -[hidden]- GloomhavenException
+    ' hidden lines for aesthetics only
+    Achievement -[hidden]- GloomhavenException
 
     hide <<gloomhaven_pckg>> stereotype
 }

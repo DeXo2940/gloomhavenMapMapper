@@ -1,3 +1,0 @@
-@startuml GloomhavenUML_withDb
-    !include includes/gloomhaven_pckg_UML.iuml
-@enduml

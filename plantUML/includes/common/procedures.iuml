@@ -6,6 +6,7 @@
 !procedure $implementation()
     +<color:#CornflowerBlue>
 !endprocedure
+
 !procedure $optional($param)
 //optional_parameter//
 !endprocedure
@@ -14,3 +15,14 @@
     $class ..> $exception : <<Throws>>
 !endprocedure
  
+!procedure $nested($outer_class, $inner_class)
+    $outer_class +- $inner_class
+!endprocedure
+
+!procedure $primary_key()
+    <color:#DarkOrange>
+!endprocedure
+
+!procedure $foreign_key()
+    <color:#DarkOrchid>
+!endprocedure

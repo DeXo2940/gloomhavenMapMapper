@@ -1,0 +1,68 @@
+
+!include ../common/procedures.iuml
+
+package peewee <<Node>> {
+    class Model <<peewee>> 
+
+    hide <<peewee>> stereotype
+    hide <<peewee>> members
+}
+
+package gloomhaven_model_pckg{
+    class BaseModel <<gloomhaven_model_pckg>> extends peewee.Model{   
+    }
+
+    class "Meta" as meta_base_model <<gloomhaven_model_pckg>>{
+        +database: peewee.Database
+    }
+    $nested(BaseModel, meta_base_model)
+
+    class Scenario <<gloomhaven_model_pckg>> extends BaseModel{
+        #$primary_key()#id 
+        +coordinates: str
+    }
+
+    class ScenarioNotes <<gloomhaven_model_pckg>> extends BaseModel{
+        #$foreign_key()id: Scenario.id
+        +notes: str
+    }
+    
+    class ScenarioName <<gloomhaven_model_pckg>> extends BaseModel{
+        #$foreign_key()id: Scenario.id
+        #$primary_key()language: str
+        +name: str
+    }
+    class "Meta" as meta_scenario_name <<gloomhaven_model_pckg>>{
+        +primary_key: peewee.CompositeKey
+        +indexes: peewee.ModelIndex
+    }
+    $nested(ScenarioName, meta_scenario_name)
+
+    class Achievement <<gloomhaven_model_pckg>> extends BaseModel{
+        #$primary_key()id: int
+        #type: str
+    }
+    class AchievementName <<gloomhaven_model_pckg>> extends BaseModel{
+        #$foreign_key()id: Achievement.
+        #$primary_key()language: str
+        +name: str
+    }
+    class "Meta" as meta_achievement_name <<gloomhaven_model_pckg>>{
+        +primary_key: peewee.CompositeKey
+        +indexes: peewee.ModelIndex
+    }
+    $nested(AchievementName, meta_achievement_name)
+
+    class Restriction <<gloomhaven_model_pckg>> extends BaseModel{
+        #$foreign_key()scenario_id: Scenario.id
+        #$foreign_key()achievement_id: Achievement.id
+        +is_done: bool
+        +level: int
+    }
+    class "Meta" as meta_restriction <<gloomhaven_model_pckg>>{
+        +primary_key: peewee.CompositeKey
+    }
+    $nested(Restriction, meta_restriction)
+    
+    hide <<gloomhaven_model_pckg>> stereotype
+}
