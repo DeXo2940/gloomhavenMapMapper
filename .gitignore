@@ -5,7 +5,6 @@ maria-db/
 out/
 
 # Don't store that yet - used for testing
-gloomhaven_console_pckg/
 main.py
 compose.yaml
 
