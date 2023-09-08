@@ -19,10 +19,15 @@
     $outer_class +- $inner_class
 !endprocedure
 
-!procedure $primary_key()
-    <color:#DarkOrange>
+!procedure $primary_key($field)
+$field <color:#DarkOrange>//pk//</color>
 !endprocedure
 
-!procedure $foreign_key()
-    <color:#DarkOrchid>
+!procedure $foreign_key($field)
+$field <color:#DarkOrchid>//fk//</color>
 !endprocedure
+
+!procedure $index($field)
+$field <color:#DarkGoldenRod>//idx//</color>
+!endprocedure
+

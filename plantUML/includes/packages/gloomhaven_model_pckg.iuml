@@ -13,43 +13,35 @@ package gloomhaven_model_pckg{
     }
 
     class "Meta" as meta_base_model <<gloomhaven_model_pckg>>{
-        +database: peewee.Database
+        database: peewee.Database
     }
     $nested(BaseModel, meta_base_model)
 
     class Scenario <<gloomhaven_model_pckg>> extends BaseModel{
-        #$primary_key()#id 
-        +name: str
-        +coordinates: str
+        $primary_key("id: int")
+        $index("name: str")
+        coordinates: str
     }
-    class "Meta" as meta_scenario <<gloomhaven_model_pckg>>{
-        +indexes: peewee.ModelIndex
-    }
-    $nested(Scenario, meta_scenario)
 
     class ScenarioNotes <<gloomhaven_model_pckg>> extends BaseModel{
-        #$foreign_key()id: Scenario.id
-        +notes: str
+        $foreign_key("id: Scenario.id") 
+        notes: str
     }
     
     class Achievement <<gloomhaven_model_pckg>> extends BaseModel{
-        #$primary_key()id: int
-        +name: str
-        #type: str
+        $primary_key("id: int")
+        $index("name: str")
+        type: str
     }
-    class "Meta" as meta_achievement <<gloomhaven_model_pckg>>{
-        +indexes: peewee.ModelIndex
-    }
-    $nested(Achievement, meta_achievement)
 
     class Restriction <<gloomhaven_model_pckg>> extends BaseModel{
-        #$foreign_key()scenario_id: Scenario.id
-        #$foreign_key()achievement_id: Achievement.id
-        +is_done: bool
-        +level: int
+        $foreign_key("scenario_id: Scenario.id")
+        $foreign_key("achievement_id: Achievement.id")
+        is_done: bool
+        level: int
     }
     class "Meta" as meta_restriction <<gloomhaven_model_pckg>>{
-        +primary_key: peewee.CompositeKey
+        primary_key: peewee.CompositeKey
     }
     $nested(Restriction, meta_restriction)
     
