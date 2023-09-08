@@ -1,6 +1,6 @@
 
 !include common/skinparams.iuml
-' !include common/legend.iuml
+!include common/legend.iuml
 
 !include packages/gloomhaven_model_pckg.iuml
 !include packages/gloomhaven_pckg.iuml
