@@ -5,7 +5,7 @@ from .model_exception import GloomhavenModelException
 from pkg_resources import ensure_directory  # pip install pymysql require
 
 # TODO: Don't define the DB here
-db = peewee.MySQLDatabase(
+database = peewee.MySQLDatabase(
     "gloomhaven",
     user="user",
     password="password",
@@ -17,7 +17,7 @@ db = peewee.MySQLDatabase(
 
 class BaseModel(peewee.Model):
     class Meta:
-        database = db
+        database = database
 
     @classmethod
     def get(cls, *query, **filters):
