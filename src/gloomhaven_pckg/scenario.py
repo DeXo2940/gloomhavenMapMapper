@@ -1,9 +1,6 @@
 from __future__ import annotations
-from typing import Any
 
 from .gloomhaven_exception import ScenarioException
-
-# from .achievement_dao import AchievementDAO
 from .requirement import Requirement
 from .coordinates import Coordinates
 
@@ -16,7 +13,6 @@ class Scenario:
         self.name = name
         self.blockers = []
         self.notes = ""
-        # self._unlocks: list[GloomhavenScenario] = []
 
     @staticmethod
     def create(id: int, coordinates: Coordinates, name: str) -> Scenario:
@@ -25,37 +21,6 @@ class Scenario:
     @staticmethod
     def create_empty(id: int) -> Scenario:
         return Scenario(id, Coordinates.create_by_string("A-1"), f"Empty Name {id}")
-
-    # @staticmethod
-    # def create_from_dict(
-    #     object_dict: dict[str, Any], achievement_dao: AchievementDAO
-    # ) -> Scenario:
-    #     id = object_dict.get("_id")
-    #     if id is None:
-    #         raise ScenarioException("Incorrect scenario Id")
-    #     scenario_id = int(id)
-
-    #     name = str(object_dict.get("name"))
-
-    #     coordinates = str(object_dict.get("coords"))
-    #     scenario_coordinates = Coordinates.create_by_string(coordinates)
-
-    #     scenario = Scenario(scenario_id, scenario_coordinates, name)
-
-    #     notes = object_dict.get("notes")
-    #     if notes != None:
-    #         scenario.notes = notes
-
-    #     scenario_blockers: list[dict[str, Any]] = []
-    #     blockers = object_dict.get("blockers")
-    #     if blockers != None and isinstance(blockers, list):
-    #         scenario_blockers = blockers
-
-    #     for blocker in scenario_blockers:
-    #         scenario_blocker = Requirement.create_from_dict(blocker, achievement_dao)
-    #         scenario.add_blocker(scenario_blocker)
-
-    #     return scenario
 
     def _validate_id(self, id: int) -> None:
         if not (1 <= id <= 95):
@@ -106,15 +71,3 @@ class Scenario:
         if blocker not in self._blockers:
             raise ScenarioException("No such requirement in scenario blockers")
         self._blockers.remove(blocker)
-
-    # def to_dict(self) -> dict[str, Any]:
-    #     return {
-    #         "_id": self._id,
-    #         "coords": str(self._coordinates),
-    #         "name": self._name,
-    #         "blockers": [blocker.to_dict() for blocker in self._blockers],
-    #         "notes": self._notes,
-    #     }
-
-    # def __repr__(self) -> str:
-    #     return str(self.to_dict())
