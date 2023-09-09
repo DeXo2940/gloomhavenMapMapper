@@ -1,3 +1,0 @@
-@startuml DbPckgUML
-    !include includes/db_pckg_UML.iuml
-@enduml

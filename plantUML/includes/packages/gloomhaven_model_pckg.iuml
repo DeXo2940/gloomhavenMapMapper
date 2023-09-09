@@ -17,7 +17,8 @@ package gloomhaven_model_pckg{
         database: peewee.Database
     }
     $nested(BaseModel, meta_base_model)
-    meta_base_model --> peewee.Database
+    peewee.Database <-- meta_base_model
+    ' meta_base_model --> peewee.Database
 
     class Scenario <<gloomhaven_model_pckg>> extends BaseModel{
         $primary_key("id: int")
@@ -26,8 +27,8 @@ package gloomhaven_model_pckg{
     }
     
     class Achievement <<gloomhaven_model_pckg>> extends BaseModel{
-        $primary_key("id: int")
-        $index("name: str")
+        $index("id: int")
+        $primary_key("name: str")
         type: str
     }
 

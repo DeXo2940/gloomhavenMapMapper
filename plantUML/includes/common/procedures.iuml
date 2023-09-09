@@ -16,7 +16,7 @@
 !endprocedure
  
 !procedure $nested($outer_class, $inner_class)
-    $outer_class +- $inner_class
+    $outer_class +-- $inner_class
 !endprocedure
 
 !procedure $primary_key($field)

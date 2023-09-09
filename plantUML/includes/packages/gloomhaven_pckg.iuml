@@ -103,10 +103,12 @@ package gloomhaven_pckg{
     Achievement o- AchievementType
     Scenario *-- Coordinates
     
-    ScenarioRepository ..> gloomhaven_model_pckg.Scenario
-    ScenarioRepository ..> gloomhaven_model_pckg.Restriction
-
-    AchievementRepository ..> gloomhaven_model_pckg.Achievement
+    gloomhaven_model_pckg.Scenario <.. ScenarioRepository
+    gloomhaven_model_pckg.Restriction <.. ScenarioRepository
+    ' ScenarioRepository ..> gloomhaven_model_pckg.Scenario
+    ' ScenarioRepository ..> gloomhaven_model_pckg.Restriction
+    gloomhaven_model_pckg.Achievemen <.. AchievementRepository
+    ' AchievementRepository ..> gloomhaven_model_pckg.Achievement
 
     ' ' hidden lines for aesthetics only
     ' Achievement -[hidden]- GloomhavenException

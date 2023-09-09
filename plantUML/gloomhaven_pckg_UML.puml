@@ -1,5 +1,4 @@
 @startuml GloomhavenUML
     !include includes/gloomhaven_pckg_UML.iuml
-
-    hide <<db_pckg>> members
+    gloomhaven_model_pckg -[hidden] Legend
 @enduml
