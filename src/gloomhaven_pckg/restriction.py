@@ -2,12 +2,12 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any
 
-# from .achievement_dao import AchievementDAO
-from .gloomhaven_exception import RequirementException
+from .gloomhaven_exception import RestrictionException
 from .achievement import Achievement
+from .dict_const import DICT_CONST
 
 
-class Requirement:
+class Restriction:
     def __init__(
         self,
         achievement: Achievement,
@@ -22,8 +22,8 @@ class Requirement:
     @lru_cache(maxsize=None)
     def create(
         achievement: Achievement, is_done: bool, level: int | None = None
-    ) -> Requirement:
-        return Requirement(achievement, is_done, level)
+    ) -> Restriction:
+        return Restriction(achievement, is_done, level)
 
     @property
     def is_done(self) -> bool:
@@ -52,4 +52,11 @@ class Requirement:
 
     def _validate_level(self, level) -> None:
         if not (level == None or 1 <= level <= 5):
-            raise RequirementException(f"Invalid requirement value: {level}")
+            raise RestrictionException(f"Invalid requirement value: {level}")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            DICT_CONST.IS_DONE: self.is_done,
+            DICT_CONST.LEVEL: self.level,
+            DICT_CONST.ACHIEVEMENT_ID: self.achievement.id,
+        }

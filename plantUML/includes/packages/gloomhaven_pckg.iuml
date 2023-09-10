@@ -9,14 +9,14 @@ package gloomhaven_pckg{
         #id: int
         +coordinates: Coordinates
         +name: str 
-        +blockers: list[Requirement]
-        +notes: str
+        +blockers: list[Restriction]
 
         +{static}create(int id, Coordinates coordinates, str name) -> Scenario
-        +{static}create_empty(id: int) -> Scenario
+        +{static}create_from_dict(scenario_dict: dict[str, Any], $optional(achievement_repository: AchievementRepository | None)) -> Scenario
         
-        +add_blocker(blocker: Requirement ) -> None
-        +remove_blocker(self, blocker: Requirement) -> None
+        +add_blocker(blocker: Restriction ) -> None
+        +remove_blocker(self, blocker: Restriction) -> None
+        +to_dict(self) -> dict[str, Any]
     } 
 
     struct Coordinates<<gloomhaven_pckg>>{
@@ -28,12 +28,13 @@ package gloomhaven_pckg{
         +__str__() -> str
     }
 
-    class Requirement<<gloomhaven_pckg>>{
+    class Restriction<<gloomhaven_pckg>>{
         +achievement: Achievement 
         +is_done: bool 
         +level: int|None
 
-        +{static}create(achievement: Achievement, is_done: bool,level: int|None) -> Requirement
+        +{static}create(achievement: Achievement, is_done: bool,level: int|None) -> Restriction
+        +to_dict(self) -> dict[str, Any]
     }
 
     class Achievement<<gloomhaven_pckg>>{
@@ -42,6 +43,9 @@ package gloomhaven_pckg{
         +type: AchievementType
 
         +{static}create(name: str, type: AchievementType) -> Achievement
+        +{static}create_from_dict(achievement_dict: dict[str, Any]) -> Achievement
+        +{static}create_empty(id: int) -> Achievement
+        +to_dict(self) -> dict[str, Any]
     }
         
     Enum AchievementType<<gloomhaven_pckg>>{
@@ -81,10 +85,10 @@ package gloomhaven_pckg{
         }
         exception CoordinatesException extends GloomhavenException
         exception ScenarioException extends GloomhavenException
-        exception RequirementException extends GloomhavenException
+        exception RestrictionException extends GloomhavenException
         exception AchievementException extends GloomhavenException
 
-        $throws(Requirement, RequirementException)
+        $throws(Restriction, RestrictionException)
         $throws(Coordinates, CoordinatesException)
         $throws(Scenario, ScenarioException)
         $throws(Achievement, AchievementException)
@@ -97,8 +101,8 @@ package gloomhaven_pckg{
     ScenarioRepository ..> AchievementRepository
     AchievementRepository ..> Achievement
     
-    Scenario "1" o- "n" Requirement
-    Requirement o- Achievement
+    Scenario "1" o- "n" Restriction
+    Restriction o- Achievement
 
     Achievement o- AchievementType
     Scenario *-- Coordinates

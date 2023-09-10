@@ -7,7 +7,7 @@ class CoordinatesException(GloomhavenException):
     pass
 
 
-class RequirementException(GloomhavenException):
+class RestrictionException(GloomhavenException):
     pass
 
 

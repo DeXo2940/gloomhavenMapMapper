@@ -7,7 +7,7 @@ import gloomhaven_model_pckg as model
 
 from .scenario import Scenario
 from .coordinates import Coordinates
-from .requirement import Requirement
+from .restriction import Restriction
 from .achievement import Achievement
 from .achievement_type import AchievementType
 from .gloomhaven_exception import ScenarioException
@@ -37,7 +37,7 @@ class ScenarioRepository:
 
         new_scenario = self._get_scenario_from_model(scenario_model)
         restrictions = self._get_restrictions_from_from_model(restriction_models)
-        new_scenario.blockers = restrictions
+        new_scenario.restrictions = restrictions
         return new_scenario
 
     def read(self) -> list[Scenario]:
@@ -51,7 +51,7 @@ class ScenarioRepository:
             scenario = self._get_scenario_from_model(scenario_model)
             restriction_models = scenario_model.restrictions
             restrictions = self._get_restrictions_from_from_model(restriction_models)
-            scenario.blockers = restrictions
+            scenario.restrictions = restrictions
             scenarios.append(scenario)
             prev_scenario_model = scenario_model
         return scenarios
@@ -64,7 +64,7 @@ class ScenarioRepository:
         scenario = self._get_scenario_from_model(scenario_model)
         restriction_models = scenario_model.restrictions
         restrictions = self._get_restrictions_from_from_model(restriction_models)
-        scenario.blockers = restrictions
+        scenario.restrictions = restrictions
         return scenario
 
     def read_by_name(self, name: str) -> Scenario:
@@ -75,7 +75,7 @@ class ScenarioRepository:
         scenario = self._get_scenario_from_model(scenario_model)
         restriction_models = scenario_model.restrictions
         restrictions = self._get_restrictions_from_from_model(restriction_models)
-        scenario.blockers = restrictions
+        scenario.restrictions = restrictions
         return scenario
 
     def update(self, scenario: Scenario) -> None:
@@ -121,7 +121,7 @@ class ScenarioRepository:
 
     def _get_restriction_models(self, scenario: Scenario) -> list[model.Restriction]:
         restriction_models = []
-        restrictions = scenario.blockers
+        restrictions = scenario.restrictions
         scenario_model = self._get_scenario_model(scenario)
         for restriction in restrictions:
             achievement = restriction.achievement
@@ -152,7 +152,7 @@ class ScenarioRepository:
 
     def _get_restrictions_from_from_model(
         self, restriction_models: list[model.Restriction]
-    ) -> list[Requirement]:
+    ) -> list[Restriction]:
         restrictions = []
         for restriction_model in restriction_models:
             restriction = self._get_restriction_from_model(restriction_model)
@@ -161,7 +161,7 @@ class ScenarioRepository:
 
     def _get_restriction_from_model(
         self, restriction_model: model.Restriction
-    ) -> Requirement:
+    ) -> Restriction:
         achievement_model = restriction_model.achievement
         achievement = self._get_achievement_from_model(achievement_model)
 
@@ -169,7 +169,7 @@ class ScenarioRepository:
         level = restriction_model.level
         if level is not None:
             level = int(str(level))
-        return Requirement(achievement, is_done, level)
+        return Restriction(achievement, is_done, level)
 
     def _get_achievement_from_model(
         self, achievement_model: model.Achievement | peewee.ForeignKeyField

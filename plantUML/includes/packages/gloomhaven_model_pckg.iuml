@@ -43,6 +43,16 @@ package gloomhaven_model_pckg{
     }
     $nested(Restriction, meta_restriction)
 
+    ' Exceptions
+    together {
+        exception GloomhavenModelException <<gloomhaven_model_pckg>>{
+            +message : str
+        }
+        $throws(BaseModel, GloomhavenModelException)
+
+        hide <<gloomhaven_model_pckg>> stereotype
+    }
+
     Restriction .. Scenario
     Restriction .. Achievement
     
