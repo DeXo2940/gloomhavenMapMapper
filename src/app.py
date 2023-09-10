@@ -125,7 +125,7 @@ def _find_achievement_by_id(id: int) -> flask.Response:
 def _add_achievement() -> flask.Response:
     achievement_json = _get_json_from_request()
     achievement = Achievement.create_from_dict(achievement_json)
-    achievement_repository.create(achievement)
+    achievement = achievement_repository.create(achievement)
     return flask.jsonify(achievement.to_dict())
 
 
@@ -149,7 +149,7 @@ def _find_scenario_by_id(id: int) -> flask.Response:
 def _add_scenario() -> flask.Response:
     scenario_json = _get_json_from_request()
     scenario = Scenario.create_from_dict(scenario_json)
-    scenario_repository.create(scenario)
+    scenario = scenario_repository.create(scenario)
     return flask.jsonify(scenario.to_dict())
 
 
