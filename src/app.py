@@ -3,16 +3,13 @@ from typing import Any, Callable
 import flask
 import uuid
 
-import gloomhaven_model_pckg as model
+from .gloomhaven_model_pckg import database, MODELS
 
-from gloomhaven_pckg import (
-    AchievementType,
+from .gloomhaven_pckg import (
     Achievement,
     AchievementRepository,
-    AchievementException,
     ScenarioRepository,
     Scenario,
-    Restriction,
     GloomhavenException,
 )
 
@@ -23,8 +20,8 @@ class GloomhavenApiException(Exception):
 
 
 # TODO set the database here
-with model.database:
-    model.database.create_tables(model.MODELS, safe=True)
+with database:
+    database.create_tables(MODELS, safe=True)
 
 achievement_repository = AchievementRepository.get_instance()
 scenario_repository = ScenarioRepository.get_instance()
@@ -35,13 +32,13 @@ app.secret_key = str(uuid.uuid4())
 
 @app.before_request
 def _db_connect() -> None:
-    model.database.connect()
+    database.connect()
 
 
 @app.teardown_request
 def _db_close(_) -> None:
-    if not model.database.is_closed():
-        model.database.close()
+    if not database.is_closed():
+        database.close()
 
 
 @app.route("/")

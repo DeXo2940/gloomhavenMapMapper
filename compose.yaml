@@ -1,0 +1,46 @@
+version: '3.4'
+
+services:
+
+  maria-db:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: gloomhaven
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./maria-db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 500M
+    networks:
+      - internal-only
+
+  gloom-api:
+    depends_on:
+      - maria-db
+    image: gloomhavenmapmapper
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 5002:5002
+    links:
+      - maria-db:mysqldb
+    restart: always
+    networks:
+      - internal-only
+      - external
+
+networks:
+  internal-only:
+    driver: bridge
+    internal: true
+  external:
+    driver: bridge

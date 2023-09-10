@@ -6,7 +6,6 @@ out/
 
 # Don't store that yet - used for testing
 main.py
-compose.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

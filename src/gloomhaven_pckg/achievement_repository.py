@@ -1,7 +1,10 @@
 from __future__ import annotations
 from functools import lru_cache
 
-import gloomhaven_model_pckg as model
+from ..gloomhaven_model_pckg import (
+    Achievement as AchievementModel,
+    GloomhavenModelException,
+)
 from .achievement_type import AchievementType
 from .achievement import Achievement
 
@@ -22,7 +25,7 @@ class AchievementRepository:
 
     def read(self) -> list[Achievement]:
         achievements = []
-        query = model.Achievement.select()
+        query = AchievementModel.select()
         for achievement_model in query:
             achievement = self._get_from_model(achievement_model)
             achievements.append(achievement)
@@ -30,16 +33,16 @@ class AchievementRepository:
 
     def read_by_id(self, id: int) -> Achievement:
         try:
-            achievement_model = model.Achievement.get(id=id)
+            achievement_model = AchievementModel.get(id=id)
             return self._get_from_model(achievement_model)
-        except model.GloomhavenModelException:
+        except GloomhavenModelException:
             raise AchievementException(f"Achievement id=`{id}` doesn't exist")
 
     def read_by_name(self, name: str) -> Achievement:
         try:
-            achievement_model = model.Achievement.get(name=name)
+            achievement_model = AchievementModel.get(name=name)
             return self._get_from_model(achievement_model)
-        except model.GloomhavenModelException:
+        except GloomhavenModelException:
             raise AchievementException(f"Achievement `{name}` doesn't exist`")
 
     def update(self, achievement: Achievement) -> None:
@@ -53,13 +56,13 @@ class AchievementRepository:
         achievement_model = self._get_model(achievement)
         achievement_model.delete_instance()
 
-    def _get_model(self, achievement: Achievement) -> model.Achievement:
+    def _get_model(self, achievement: Achievement) -> AchievementModel:
         id = achievement.id
         type_name = achievement.type.name
         name = achievement.name
-        return model.Achievement(type=type_name, name=name, id=id)
+        return AchievementModel(type=type_name, name=name, id=id)
 
-    def _get_from_model(self, achievement_model: model.Achievement) -> Achievement:
+    def _get_from_model(self, achievement_model: AchievementModel) -> Achievement:
         id = achievement_model.id
         name = achievement_model.name
         type_name = str(achievement_model.type)

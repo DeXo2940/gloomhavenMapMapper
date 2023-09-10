@@ -3,7 +3,11 @@ from functools import lru_cache
 
 import peewee
 
-import gloomhaven_model_pckg as model
+from ..gloomhaven_model_pckg import (
+    Scenario as ScenarioModel,
+    Restriction as RestrictionModel,
+    Achievement as AchievementModel,
+)
 
 from .scenario import Scenario
 from .coordinates import Coordinates
@@ -84,8 +88,8 @@ class ScenarioRepository:
         restriction_models = self._get_restriction_models(scenario)
 
         scenario_model.save()
-        model.Restriction.delete().where(
-            model.Restriction.scenario == scenario_model
+        RestrictionModel.delete().where(
+            RestrictionModel.scenario == scenario_model
         ).execute()
         self._try_to_save_restrictions(restriction_models)
 
@@ -98,31 +102,31 @@ class ScenarioRepository:
         return self._get_select_query(where)
 
     def _get_where_id(self, id: int) -> peewee.Expression:
-        return model.Scenario.id == id
+        return ScenarioModel.id == id
 
     def _get_select_name(self, name: str) -> peewee.ModelSelect:
         where = self._get_where_name(name)
         return self._get_select_query(where)
 
     def _get_where_name(self, name: str) -> peewee.Expression:
-        return model.Scenario.name == name
+        return ScenarioModel.name == name
 
     def _get_select_query(
         self, where: peewee.Expression | None = None
     ) -> peewee.ModelSelect:
         return (
-            model.Scenario.select()
-            .join(model.Restriction, peewee.JOIN.LEFT_OUTER)
+            ScenarioModel.select()
+            .join(RestrictionModel, peewee.JOIN.LEFT_OUTER)
             .where(where)
         )
 
-    def _get_scenario_model(self, scenario: Scenario) -> model.Scenario:
+    def _get_scenario_model(self, scenario: Scenario) -> ScenarioModel:
         id = scenario.id
         name = scenario.name
         coordinates = str(scenario.coordinates)
-        return model.Scenario(id=id, name=name, coordinates=coordinates)
+        return ScenarioModel(id=id, name=name, coordinates=coordinates)
 
-    def _get_restriction_models(self, scenario: Scenario) -> list[model.Restriction]:
+    def _get_restriction_models(self, scenario: Scenario) -> list[RestrictionModel]:
         restriction_models = []
         restrictions = scenario.restrictions
         scenario_model = self._get_scenario_model(scenario)
@@ -131,7 +135,7 @@ class ScenarioRepository:
             is_done = restriction.is_done
             level = restriction.level
             achievement_model = self._get_achievement_model(achievement)
-            restriction_model = model.Restriction(
+            restriction_model = RestrictionModel(
                 scenario=scenario_model,
                 achievement=achievement_model,
                 is_done=is_done,
@@ -140,13 +144,13 @@ class ScenarioRepository:
             restriction_models.append(restriction_model)
         return restriction_models
 
-    def _get_achievement_model(self, achievement: Achievement) -> model.Achievement:
+    def _get_achievement_model(self, achievement: Achievement) -> AchievementModel:
         id = achievement.id
         type_name = achievement.type.name
         name = achievement.name
-        return model.Achievement(type=type_name, name=name, id=id)
+        return AchievementModel(type=type_name, name=name, id=id)
 
-    def _get_scenario_from_model(self, scenario_model: model.Scenario) -> Scenario:
+    def _get_scenario_from_model(self, scenario_model: ScenarioModel) -> Scenario:
         id = int(str(scenario_model.id))
         name = str(scenario_model.name)
         scenario_model_coordinates = scenario_model.coordinates
@@ -154,7 +158,7 @@ class ScenarioRepository:
         return Scenario.create(id, coordinates, name)
 
     def _get_restrictions_from_from_model(
-        self, restriction_models: list[model.Restriction]
+        self, restriction_models: list[RestrictionModel]
     ) -> list[Restriction]:
         restrictions = []
         for restriction_model in restriction_models:
@@ -163,7 +167,7 @@ class ScenarioRepository:
         return restrictions
 
     def _get_restriction_from_model(
-        self, restriction_model: model.Restriction
+        self, restriction_model: RestrictionModel
     ) -> Restriction:
         achievement_model = restriction_model.achievement
         achievement = self._get_achievement_from_model(achievement_model)
@@ -175,7 +179,7 @@ class ScenarioRepository:
         return Restriction(achievement, is_done, level)
 
     def _get_achievement_from_model(
-        self, achievement_model: model.Achievement | peewee.ForeignKeyField
+        self, achievement_model: AchievementModel | peewee.ForeignKeyField
     ) -> Achievement:
         id = achievement_model.id
         name = achievement_model.name
@@ -183,7 +187,9 @@ class ScenarioRepository:
         achievement_type = AchievementType[type_name]
         return Achievement.create(name, achievement_type, id)
 
-    def _try_to_save_restrictions(self, restriction_models: list[model.Restriction]):
+    def _try_to_save_restrictions(
+        self, restriction_models: list[RestrictionModel]
+    ) -> None:
         for restriction_model in restriction_models:
             try:
                 restriction_model.save(True)

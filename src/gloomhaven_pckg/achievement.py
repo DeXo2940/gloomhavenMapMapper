@@ -2,8 +2,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any
 
-from gloomhaven_pckg.gloomhaven_exception import AchievementException
-
+from .gloomhaven_exception import AchievementException
 from .achievement_type import AchievementType
 from .dict_const import DICT_CONST
 

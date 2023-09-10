@@ -2,14 +2,14 @@ from __future__ import annotations
 import peewee
 
 from .model_exception import GloomhavenModelException
-from pkg_resources import ensure_directory  # pip install pymysql require
+from pkg_resources import ensure_directory
 
 # TODO: Don't define the DB here
 database = peewee.MySQLDatabase(
     "gloomhaven",
     user="user",
     password="password",
-    host="localhost",
+    host="mysqldb",
     port=3306,
     autoconnect=False,
 )
