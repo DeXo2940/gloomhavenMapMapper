@@ -83,8 +83,11 @@ class ScenarioRepository:
         restriction_models = self._get_restriction_models(scenario)
 
         scenario_model.save()
+        model.Restriction.delete().where(
+            model.Restriction.scenario == scenario_model
+        ).execute()
         for restriction_model in restriction_models:
-            restriction_model.replace()
+            restriction_model.save(True)
 
     def delete(self, scenario: Scenario) -> None:
         scenario_model = self._get_scenario_model(scenario)
