@@ -1,11 +1,16 @@
 from __future__ import annotations
+import os
+import sys
 from typing import Any, Callable
 import flask
 import uuid
 
-from .gloomhaven_model_pckg import database, MODELS
 
-from .gloomhaven_pckg import (
+sys.path.append(os.path.dirname(__file__))
+
+from gloomhaven_model_pckg import database, MODELS
+
+from gloomhaven_pckg import (
     Achievement,
     AchievementRepository,
     ScenarioRepository,

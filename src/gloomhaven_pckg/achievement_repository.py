@@ -1,7 +1,7 @@
 from __future__ import annotations
 from functools import lru_cache
 
-from ..gloomhaven_model_pckg import (
+from gloomhaven_model_pckg import (
     Achievement as AchievementModel,
     GloomhavenModelException,
 )

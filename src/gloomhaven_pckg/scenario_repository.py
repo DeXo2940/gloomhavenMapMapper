@@ -3,7 +3,7 @@ from functools import lru_cache
 
 import peewee
 
-from ..gloomhaven_model_pckg import (
+from gloomhaven_model_pckg import (
     Scenario as ScenarioModel,
     Restriction as RestrictionModel,
     Achievement as AchievementModel,
