@@ -190,5 +190,9 @@ class ScenarioRepository:
             except peewee.IntegrityError:
                 raise ScenarioException(
                     f"Error durring Restriction creation for scenario id=`{restriction_model.scenario.id}`"
+<<<<<<< HEAD
                     + f"\nSpecified restriction achievement doesn't exist, or same restriction is beeing inserted multiple times"
+=======
+                    + f"\nSpecified achievement doesn't exist, or same achievement is beeing inserted multiple times"
+>>>>>>> 0b853bd196b467a0e859845bbe525c2cc9cdaf04
                 )
