@@ -46,7 +46,7 @@ class AchievementRepository:
         achievement_model = self._get_model(achievement)
         if achievement_model.save() != 1:
             raise AchievementException(
-                f"Achievement id=`{achievement.id}` `{achievement.name}` couldn't be updated exist"
+                f"Achievement id=`{achievement.id}` `{achievement.name}` couldn't be updated"
             )
 
     def delete(self, achievement: Achievement) -> None:
