@@ -44,7 +44,10 @@ class AchievementRepository:
 
     def update(self, achievement: Achievement) -> None:
         achievement_model = self._get_model(achievement)
-        achievement_model.save()
+        if achievement_model.save() != 1:
+            raise AchievementException(
+                f"Achievement id=`{achievement.id}` `{achievement.name}` couldn't be updated exist"
+            )
 
     def delete(self, achievement: Achievement) -> None:
         achievement_model = self._get_model(achievement)
@@ -61,4 +64,4 @@ class AchievementRepository:
         name = achievement_model.name
         type_name = str(achievement_model.type)
         achievement_type = AchievementType[type_name]
-        return Achievement.create(id, name, achievement_type)
+        return Achievement.create(name, achievement_type, id)
