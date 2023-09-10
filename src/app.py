@@ -3,47 +3,45 @@ from typing import Any, Callable
 import flask
 import uuid
 
-from db_pckg import DbException, DbFilter, MongoDbAccess, MognoDbFilter, MongoDbAccess
+import gloomhaven_model_pckg as model
 
-
-from gloomhaven_scenarios_pckg import (
-    ScenarioDAO,
-    Scenario,
-    Coordinates,
-    Achievement,
+from gloomhaven_pckg import (
     AchievementType,
-    AchievementDAO,
-    Requirement,
+    Achievement,
+    AchievementRepository,
+    AchievementException,
+    ScenarioRepository,
+    Scenario,
+    Restriction,
     GloomhavenException,
 )
 
 
-CONNECTION_STRING = "mongodb://localhost:27017/"
-DB_NAME = "gloomhaven_db"
-
-# or perhaps should be:
-#
-# mongo_db_access = MongoDbAccess.create(CONNECTION_STRING, DB_NAME)
-#
-# to have one db_access through all DAOs
-# and then all calls id DAOs would need to call the db_access with collection name?
-# but that would mean, that the methods accept collection name/table name,
-# but the name would need to suggest that both are correct depending on the implementation
+class GloomhavenApiException(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
 
 
-def _create_db_access(collection_name: str) -> MongoDbAccess:
-    return MongoDbAccess.create(CONNECTION_STRING, DB_NAME, collection_name)
+# TODO set the database here
+with model.database:
+    model.database.create_tables(model.MODELS, safe=True)
 
-
-mongo_db_achievement_access = _create_db_access(AchievementDAO.COLLECTION_NAME)
-achievement_dao = AchievementDAO.get_instance(mongo_db_achievement_access)
-
-mongo_db_scenario_access = _create_db_access(ScenarioDAO.COLLECTION_NAME)
-scenario_dao = ScenarioDAO.get_instance(mongo_db_scenario_access, achievement_dao)
-
+achievement_repository = AchievementRepository.get_instance()
+scenario_repository = ScenarioRepository.get_instance()
 
 app = flask.Flask(__name__)
 app.secret_key = str(uuid.uuid4())
+
+
+@app.before_request
+def _db_connect() -> None:
+    model.database.connect()
+
+
+@app.teardown_request
+def _db_close(_) -> None:
+    if not model.database.is_closed():
+        model.database.close()
 
 
 @app.route("/")
@@ -54,16 +52,22 @@ def ping() -> flask.Literal[str]:
 
 @app.route("/achievements")
 def get_achievements() -> flask.Response:
-    return _try_for_exceptions_no_param(_find_all_achievements)
+    return _try_for_exceptions_no_param(_get_all_achievements)
+
+
+@app.route("/achievements(<id>)")
+def get_achievement_by_id(id: int) -> flask.Response:
+    return _try_for_exceptions_with_param(_find_achievement_by_id, id)
 
 
 @app.route("/achievements", methods=["POST"])
 def add_achievement() -> flask.Response:
-    achievement_json = flask.request.get_json(silent=True)
-    if achievement_json is None:
-        return _incorrect_json_error()
+    return _try_for_exceptions_no_param(_add_achievement)
 
-    return _try_for_exceptions_with_param(_save_achievement, achievement_json)
+
+@app.route("/achievements", methods=["PATCH"])
+def modify_achievement() -> flask.Response:
+    return _try_for_exceptions_no_param(_modify_achievement)
 
 
 @app.route("/scenarios")
@@ -78,11 +82,12 @@ def get_scenario_by_id(id: int) -> flask.Response:
 
 @app.route("/scenarios", methods=["POST"])
 def add_scenarios() -> flask.Response:
-    scenario_json = flask.request.get_json(silent=True)
-    if scenario_json is None:
-        return _incorrect_json_error()
+    return _try_for_exceptions_no_param(_add_scenario)
 
-    return _try_for_exceptions_with_param(_save_scenario, scenario_json)
+
+@app.route("/scenarios", methods=["PATCH"])
+def modify_scenario() -> flask.Response:
+    return _try_for_exceptions_no_param(_modify_scenario)
 
 
 def _try_for_exceptions_with_param(
@@ -92,8 +97,8 @@ def _try_for_exceptions_with_param(
         return callable_method(param)
     except GloomhavenException as gloomhaven_exception:
         return flask.Response(gloomhaven_exception.message, status=406)
-    except DbException as db_exception:
-        return flask.Response(db_exception.message, status=503)
+    except GloomhavenApiException as gloomhaven_api_exception:
+        return flask.Response(gloomhaven_api_exception.message, status=400)
 
 
 def _try_for_exceptions_no_param(
@@ -103,49 +108,63 @@ def _try_for_exceptions_no_param(
         return callable_method()
     except GloomhavenException as gloomhaven_exception:
         return flask.Response(gloomhaven_exception.message, status=406)
-    except DbException as db_exception:
-        return flask.Response(db_exception.message, status=503)
+    except GloomhavenApiException as gloomhaven_api_exception:
+        return flask.Response(gloomhaven_api_exception.message, status=400)
 
 
-def _find_all_achievements() -> flask.Response:
-    achievements = achievement_dao.find_all()
-    achievement_dicts = [achievement.to_dict() for achievement in achievements]
-    return flask.jsonify(achievement_dicts)
+def _get_all_achievements() -> flask.Response:
+    achievements = achievement_repository.read()
+    return flask.jsonify([achievement.to_dict() for achievement in achievements])
 
 
-def _save_achievement(object_json: Any) -> flask.Response:
-    achievement = Achievement.create_from_dict(object_json)
-    achievement_dao.save_one(achievement)
-    return flask.Response(repr(achievement), status=201)
+def _find_achievement_by_id(id: int) -> flask.Response:
+    achievement = achievement_repository.read_by_id(id)
+    return flask.jsonify(achievement.to_dict())
+
+
+def _add_achievement() -> flask.Response:
+    achievement_json = _get_json_from_request()
+    achievement = Achievement.create_from_dict(achievement_json)
+    achievement_repository.create(achievement)
+    return flask.jsonify(achievement.to_dict())
+
+
+def _modify_achievement() -> flask.Response:
+    achievement_json = _get_json_from_request()
+    achievement = Achievement.create_from_dict(achievement_json)
+    achievement_repository.update(achievement)
+    return flask.jsonify(achievement.to_dict())
 
 
 def _find_all_scenarios() -> flask.Response:
-    scenarios = scenario_dao.find_all()
-    scenario_dicts = [scenario.to_dict() for scenario in scenarios]
-
-    for scenario_dict in scenario_dicts:
-        blockers = scenario_dict.get("blockers")
-        if blockers is None:
-            continue
-        for restriction in blockers:
-            restriction.get("")
-
-    return flask.jsonify(scenario_dicts)
+    scenarios = scenario_repository.read()
+    return flask.jsonify([scenario.to_dict() for scenario in scenarios])
 
 
 def _find_scenario_by_id(id: int) -> flask.Response:
-    scenario = scenario_dao.find_by_id(id)
-    return flask.Response(repr(scenario), status=201)
+    scenario = scenario_repository.read_by_id(id)
+    return flask.jsonify(scenario.to_dict())
 
 
-def _save_scenario(object_json: Any) -> flask.Response:
-    scenario = Scenario.create_from_dict(object_json, achievement_dao)
-    scenario_dao.save_one(scenario)
-    return flask.Response(repr(scenario), status=201)
+def _add_scenario() -> flask.Response:
+    scenario_json = _get_json_from_request()
+    scenario = Scenario.create_from_dict(scenario_json)
+    scenario_repository.create(scenario)
+    return flask.jsonify(scenario.to_dict())
 
 
-def _incorrect_json_error() -> flask.Response:
-    return flask.Response("Incorrect request body", status=400)
+def _modify_scenario() -> flask.Response:
+    scenario_json = _get_json_from_request()
+    scenario = Scenario.create_from_dict(scenario_json)
+    scenario_repository.update(scenario)
+    return flask.jsonify(scenario.to_dict())
+
+
+def _get_json_from_request() -> dict[str, Any]:
+    object_json = flask.request.get_json(silent=True)
+    if object_json is None:
+        raise GloomhavenApiException("Incorrect request body")
+    return object_json
 
 
 if __name__ == "__main__":
