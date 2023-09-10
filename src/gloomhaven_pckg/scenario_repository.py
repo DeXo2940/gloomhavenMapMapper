@@ -87,7 +87,12 @@ class ScenarioRepository:
             model.Restriction.scenario == scenario_model
         ).execute()
         for restriction_model in restriction_models:
-            restriction_model.save(True)
+            try:
+                restriction_model.save(True)
+            except peewee.IntegrityError:
+                raise ScenarioException(
+                    f"No achievement for specified restriction exists"
+                )
 
     def delete(self, scenario: Scenario) -> None:
         scenario_model = self._get_scenario_model(scenario)
