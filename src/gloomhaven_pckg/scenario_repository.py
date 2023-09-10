@@ -31,10 +31,11 @@ class ScenarioRepository:
         scenario_model = self._get_scenario_model(scenario)
         restriction_models = self._get_restriction_models(scenario)
 
-        scenario_model.save(True)
-        for restriction_model in restriction_models:
-            restriction_model.save(True)
-
+        try:
+            scenario_model.save(True)
+        except peewee.IntegrityError:
+            raise ScenarioException(f"Scenario id=`{scenario.id}` already exists")
+        self._try_to_save_restrictions(restriction_models)
         new_scenario = self._get_scenario_from_model(scenario_model)
         restrictions = self._get_restrictions_from_from_model(restriction_models)
         new_scenario.restrictions = restrictions
@@ -86,14 +87,7 @@ class ScenarioRepository:
         model.Restriction.delete().where(
             model.Restriction.scenario == scenario_model
         ).execute()
-        for restriction_model in restriction_models:
-            try:
-                restriction_model.save(True)
-            except peewee.IntegrityError:
-                raise ScenarioException(
-                    f"Error durring Restriction creation for scenario id=`{scenario.id}`"
-                    + f"\nSpecified achievement doesn't exist, or same achievement is beeing inserted multiple times"
-                )
+        self._try_to_save_restrictions(restriction_models)
 
     def delete(self, scenario: Scenario) -> None:
         scenario_model = self._get_scenario_model(scenario)
@@ -188,3 +182,13 @@ class ScenarioRepository:
         type_name = str(achievement_model.type)
         achievement_type = AchievementType[type_name]
         return Achievement.create(name, achievement_type, id)
+
+    def _try_to_save_restrictions(self, restriction_models: list[model.Restriction]):
+        for restriction_model in restriction_models:
+            try:
+                restriction_model.save(True)
+            except peewee.IntegrityError:
+                raise ScenarioException(
+                    f"Error durring Restriction creation for scenario id=`{restriction_model.scenario.id}`"
+                    + f"\nSpecified achievement doesn't exist, or same achievement is beeing inserted multiple times"
+                )
