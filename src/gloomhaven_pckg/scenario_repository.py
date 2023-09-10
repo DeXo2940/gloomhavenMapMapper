@@ -187,4 +187,4 @@ class ScenarioRepository:
         name = achievement_model.name
         type_name = str(achievement_model.type)
         achievement_type = AchievementType[type_name]
-        return Achievement.create(id, name, achievement_type)
+        return Achievement.create(name, achievement_type, id)
