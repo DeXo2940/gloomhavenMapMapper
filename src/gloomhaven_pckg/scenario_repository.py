@@ -91,7 +91,8 @@ class ScenarioRepository:
                 restriction_model.save(True)
             except peewee.IntegrityError:
                 raise ScenarioException(
-                    f"No achievement for specified restriction exists"
+                    f"Error durring Restriction creation for scenario id=`{scenario.id}`"
+                    + f"\nSpecified achievement doesn't exist, or same achievement is beeing inserted multiple times"
                 )
 
     def delete(self, scenario: Scenario) -> None:
