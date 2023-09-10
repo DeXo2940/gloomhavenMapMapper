@@ -58,21 +58,21 @@ class Scenario:
 
     @property
     def restrictions(self) -> list[Restriction]:
-        return self._blockers
+        return self._restrictions
 
     @restrictions.setter
-    def restrictions(self, blockers: list[Restriction]) -> None:
-        self._blockers = blockers
+    def restrictions(self, restrictions: list[Restriction]) -> None:
+        self._restrictions = restrictions
 
-    def add_blocker(self, blocker: Restriction) -> None:
-        if blocker in self._blockers:
-            raise ScenarioException("Requirement already in scenario blockers")
-        self._blockers.append(blocker)
+    def add_restriction(self, restriction: Restriction) -> None:
+        if restriction in self._restrictions:
+            raise ScenarioException("Requirement already in scenario1 restrictions")
+        self._restrictions.append(restriction)
 
-    def remove_blocker(self, blocker: Restriction) -> None:
-        if blocker not in self._blockers:
-            raise ScenarioException("No such requirement in scenario blockers")
-        self._blockers.remove(blocker)
+    def remove_restriction(self, restriction: Restriction) -> None:
+        if restriction not in self._restrictions:
+            raise ScenarioException("No such requirement in scenario restrictions")
+        self._restrictions.remove(restriction)
 
     def to_dict(self) -> dict[str, Any]:
         return {
