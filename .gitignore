@@ -2,8 +2,6 @@
 mongo/
 maria-db/
 gloomhaven.db
-# Don't store the UMLs
-out/
 
 # Don't store that yet - used for testing
 main.py
