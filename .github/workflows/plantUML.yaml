@@ -1,44 +1,45 @@
-name: Generate SVGs from PlantUML
+name: Generate PlantUML Diagrams
 
 on:
   push:
     branches: [ "test_for_actions" ]
 
 jobs:
-  generate-svgs:
+  ci:
     runs-on: ubuntu-latest
-
+    env:
+        UML_FILES: ".puml"
     steps:
-      - name: Checkout code
+      - name: Checkout Source 
         uses: actions/checkout@v2
-
-      - name: Setup Java
-        uses: actions/setup-java@v2
         with:
-          java-version: 1.8
-
-      - name: Generate SVGs
+          fetch-depth: 0
+      - name: Get changed UML files
+        id: getfile
         run: |
-          PLANTUML="path/to/plantuml.jar"
-          UML_DIR="path/to/your/uml/files"
-          SVG_DIR="path/to/your/svg/files"
-          mkdir -p "$SVG_DIR"
-
-          for UML_FILE in "$UML_DIR"/*.iuml "$UML_DIR"/*.puml; do
-              BASENAME=$(basename "$UML_FILE")
-              SVG_FILE="$SVG_DIR/${BASENAME%.*}.svg"
-              java -jar "$PLANTUML" -tsvg -o "$SVG_DIR" "$UML_FILE"
-          done
-
-      - name: Commit SVGs
+          git diff-tree -r --no-commit-id --summary ${{ github.sha }} \
+          | awk -F' ' '{
+            if ( $1 !~ /^delete$/ && $4 ~ /\.puml$/ && $4 !~ /(theme|config)\.puml$/ )
+            {
+              printf "::set-output name=files::" "%s ", $4
+            }
+          }
+          END { print "" } # ensure we do print a newline at the end
+          '
+      - name: UML files considered echo output
         run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          
-          # Set up the Personal Access Token
-          GH_PAT="${{ secrets.GH_PAT_PLANT_UML }}"
-          git remote set-url origin "https://$GH_PAT@github.com/${{ github.repository }}.git"
+          echo ${{ steps.getfile.outputs.files }}
 
-          git add "$SVG_DIR"
-          git commit -m "Generate SVGs from PlantUML"
-          git push
+      - name: Generate SVG Diagrams
+        uses: cloudbees/plantuml-github-action@master
+        with:
+            args: -v -tsvg ${{ steps.getfile.outputs.files }}
+
+      - name: Push Local Changes
+        uses:  stefanzweifel/git-auto-commit-action@v4.1.2 
+        with: 
+          commit_user_name: "my user name"
+          commit_user_email: "me@email.org"
+          commit_author: "My User <me@email.org>"
+          commit_message: "Generate SVG images for PlantUML diagrams" 
+          branch: ${{ github.head_ref }}
