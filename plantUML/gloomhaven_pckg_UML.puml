@@ -3,4 +3,5 @@
     !include includes/gloomhaven_pckg_UML.iuml
 
     gloomhaven_model_pckg -[hidden]- Legend
+    class Sth
 @enduml
