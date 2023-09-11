@@ -34,11 +34,22 @@ jobs:
         with:
           args: -v -o out -tsvg  ${{ steps.get-changed-uml-files.outputs.puml-files }}
           
-      - name: Push Local Changes
-        uses:  stefanzweifel/git-auto-commit-action@v4.1.2 
-        with: 
-          commit_user_name: "PlantUML Diagramm Renderer"
-          commit_user_email: "plantuml@your-domain.com"
-          commit_author: "PLantUML <plantuml@your-domain.com>"
-          commit_message: "Generated SVG images for PlantUML diagrams" 
-          branch: ${{ github.head_ref }}
+      # - name: Push Local Changes
+      #   uses:  stefanzweifel/git-auto-commit-action@v4.1.2 
+      #   with: 
+      #     commit_user_name: "PlantUML Diagramm Renderer"
+      #     commit_user_email: "plantuml@your-domain.com"
+      #     commit_author: "PLantUML <plantuml@your-domain.com>"
+      #     commit_message: "Generated SVG images for PlantUML diagrams" 
+      #     branch: ${{ github.head_ref }}
+      - name: Commit SVGs
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          
+          GH_PAT="${{ secrets.GH_PAT_PLANT_UML }}"
+          git remote set-url origin "https://$GH_PAT@github.com/${{ github.repository }}.git"
+
+          git add "$SVG_DIR"
+          git commit -m "Generate SVGs from PlantUML"
+          git push
