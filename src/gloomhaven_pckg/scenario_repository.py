@@ -34,7 +34,6 @@ class ScenarioRepository:
     def create(self, scenario: Scenario) -> Scenario:
         scenario_model = self._get_scenario_model(scenario)
         restriction_models = self._get_restriction_models(scenario)
-
         try:
             scenario_model.save(True)
         except peewee.IntegrityError:
@@ -46,20 +45,13 @@ class ScenarioRepository:
         return new_scenario
 
     def read(self) -> list[Scenario]:
-        scenarios = []
         query = self._get_select_query()
+        return self._get_scenarios_from_select_query(query)
 
-        prev_scenario_model = None
-        for scenario_model in query:
-            if scenario_model == prev_scenario_model:
-                continue
-            scenario = self._get_scenario_from_model(scenario_model)
-            restriction_models = scenario_model.restrictions
-            restrictions = self._get_restrictions_from_from_model(restriction_models)
-            scenario.restrictions = restrictions
-            scenarios.append(scenario)
-            prev_scenario_model = scenario_model
-        return scenarios
+    def read_by_partial_name(self, partial_name: str) -> list[Scenario]:
+        query_where = self._get_where_name_ilike(partial_name)
+        query = self._get_select_query(query_where)
+        return self._get_scenarios_from_select_query(query)
 
     def read_by_id(self, id: int) -> Scenario:
         query = self._get_select_id(id)
@@ -119,6 +111,24 @@ class ScenarioRepository:
             .join(RestrictionModel, peewee.JOIN.LEFT_OUTER)
             .where(where)
         )
+
+    def _get_where_name_ilike(self, partial_name: str) -> peewee.Expression:
+        search_name = f"%{partial_name}%"
+        return ScenarioModel.name**search_name
+
+    def _get_scenarios_from_select_query(self, query) -> list[Scenario]:
+        scenarios = []
+        prev_scenario_model = None
+        for scenario_model in query:
+            if scenario_model == prev_scenario_model:
+                continue
+            scenario = self._get_scenario_from_model(scenario_model)
+            restriction_models = scenario_model.restrictions
+            restrictions = self._get_restrictions_from_from_model(restriction_models)
+            scenario.restrictions = restrictions
+            scenarios.append(scenario)
+            prev_scenario_model = scenario_model
+        return scenarios
 
     def _get_scenario_model(self, scenario: Scenario) -> ScenarioModel:
         id = scenario.id

@@ -84,12 +84,17 @@ def ping() -> flask.Literal[str]:
 
 @app.route("/achievements")
 def get_achievements() -> flask.Response:
+    search_name = flask.request.args.get("name")
+    if search_name is not None:
+        return _try_for_exceptions_with_param(
+            _get_achievements_by_partial_name, search_name
+        )
     return _try_for_exceptions_no_param(_get_all_achievements)
 
 
-@app.route("/achievements(<id>)")
+@app.route("/achievements/<id>")
 def get_achievement_by_id(id: int) -> flask.Response:
-    return _try_for_exceptions_with_param(_find_achievement_by_id, id)
+    return _try_for_exceptions_with_param(_get_achievement_by_id, id)
 
 
 @app.route("/achievements", methods=["POST"])
@@ -104,12 +109,17 @@ def modify_achievement() -> flask.Response:
 
 @app.route("/scenarios")
 def get_scenarios() -> flask.Response:
-    return _try_for_exceptions_no_param(_find_all_scenarios)
+    search_name = flask.request.args.get("name")
+    if search_name is not None:
+        return _try_for_exceptions_with_param(
+            _get_scenarios_by_partial_name, search_name
+        )
+    return _try_for_exceptions_no_param(_get_all_scenarios)
 
 
-@app.route("/scenarios(<id>)")
+@app.route("/scenarios/<id>")
 def get_scenario_by_id(id: int) -> flask.Response:
-    return _try_for_exceptions_with_param(_find_scenario_by_id, id)
+    return _try_for_exceptions_with_param(_get_scenario_by_id, id)
 
 
 @app.route("/scenarios", methods=["POST"])
@@ -149,7 +159,12 @@ def _get_all_achievements() -> flask.Response:
     return flask.jsonify([achievement.to_dict() for achievement in achievements])
 
 
-def _find_achievement_by_id(id: int) -> flask.Response:
+def _get_achievements_by_partial_name(partial_name: str) -> flask.Response:
+    achievements = achievement_repository.read_by_partial_name(partial_name)
+    return flask.jsonify([achievement.to_dict() for achievement in achievements])
+
+
+def _get_achievement_by_id(id: int) -> flask.Response:
     achievement = achievement_repository.read_by_id(id)
     return flask.jsonify(achievement.to_dict())
 
@@ -168,12 +183,17 @@ def _modify_achievement() -> flask.Response:
     return flask.jsonify(achievement.to_dict())
 
 
-def _find_all_scenarios() -> flask.Response:
+def _get_all_scenarios() -> flask.Response:
     scenarios = scenario_repository.read()
     return flask.jsonify([scenario.to_dict() for scenario in scenarios])
 
 
-def _find_scenario_by_id(id: int) -> flask.Response:
+def _get_scenarios_by_partial_name(partial_name: str) -> flask.Response:
+    scenarios = scenario_repository.read_by_partial_name(partial_name)
+    return flask.jsonify([scenario.to_dict() for scenario in scenarios])
+
+
+def _get_scenario_by_id(id: int) -> flask.Response:
     scenario = scenario_repository.read_by_id(id)
     return flask.jsonify(scenario.to_dict())
 
