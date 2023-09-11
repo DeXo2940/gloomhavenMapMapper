@@ -1,4 +1,4 @@
-from .base_model import database
+from .base_model import database_proxy
 from .scenario import Scenario
 from .achievement import Achievement
 from .restriction import Restriction

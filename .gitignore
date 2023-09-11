@@ -1,6 +1,7 @@
 # Don't store data in the project
 mongo/
 maria-db/
+gloomhaven.db
 # Don't store the UMLs
 out/
 

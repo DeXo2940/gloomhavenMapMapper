@@ -8,7 +8,7 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: gloomhaven
       MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - ./maria-db:/var/lib/mysql
     ports:
@@ -17,8 +17,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.40'
-          memory: 500M
+          cpus: '0.25'
+          memory: 150M
     networks:
       - internal-only
 
@@ -29,11 +29,22 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    environment:
+      DB_DATABASE: gloomhaven
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_PORT: 3306
+      DB_USE_LINK: true
     ports:
       - 5002:5002
     links:
       - maria-db:mysqldb
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 50M
     networks:
       - internal-only
       - external

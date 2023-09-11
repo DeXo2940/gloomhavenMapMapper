@@ -27,5 +27,6 @@
 **/.pytest_cache
 **/plantUML
 **/maria-db
+**/gloomhaven.db
 LICENSE
 README.md

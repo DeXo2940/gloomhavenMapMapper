@@ -4,11 +4,11 @@ import sys
 from typing import Any, Callable
 import flask
 import uuid
-
+import peewee
 
 sys.path.append(os.path.dirname(__file__))
 
-from gloomhaven_model_pckg import database, MODELS
+from gloomhaven_model_pckg import database_proxy, MODELS
 
 from gloomhaven_pckg import (
     Achievement,
@@ -24,9 +24,39 @@ class GloomhavenApiException(Exception):
         self.message = message
 
 
-# TODO set the database here
-with database:
-    database.create_tables(MODELS, safe=True)
+db_port = os.environ.get("DB_PORT")
+db_user = os.environ.get("DB_USER")
+db_password = os.environ.get("DB_PASSWORD")
+db_database = os.environ.get("DB_DATABASE")
+
+db_use_link = os.environ.get("DB_USE_LINK")
+db_host = "mysqldb" if db_use_link == True else os.environ.get("DB_HOST")
+
+print(db_port, db_user, db_password, db_database, db_use_link, db_host)
+
+
+if (
+    db_port is not None
+    and db_user is not None
+    and db_password is not None
+    and db_database is not None
+    and db_host is not None
+):
+    database = peewee.MySQLDatabase(
+        db_database,
+        user=db_user,
+        password=db_password,
+        host=db_host,
+        port=db_port,
+        autoconnect=False,
+    )
+else:
+    database = peewee.SqliteDatabase("gloomhaven.db")
+
+database_proxy.initialize(database)
+
+with database_proxy:
+    database_proxy.create_tables(MODELS, safe=True)
 
 achievement_repository = AchievementRepository.get_instance()
 scenario_repository = ScenarioRepository.get_instance()
@@ -37,13 +67,13 @@ app.secret_key = str(uuid.uuid4())
 
 @app.before_request
 def _db_connect() -> None:
-    database.connect()
+    database_proxy.connect()
 
 
 @app.teardown_request
 def _db_close(_) -> None:
-    if not database.is_closed():
-        database.close()
+    if not database_proxy.is_closed():
+        database_proxy.close()
 
 
 @app.route("/")
@@ -67,7 +97,7 @@ def add_achievement() -> flask.Response:
     return _try_for_exceptions_no_param(_add_achievement)
 
 
-@app.route("/achievements", methods=["PATCH"])
+@app.route("/achievements", methods=["PUT"])
 def modify_achievement() -> flask.Response:
     return _try_for_exceptions_no_param(_modify_achievement)
 
@@ -87,7 +117,7 @@ def add_scenarios() -> flask.Response:
     return _try_for_exceptions_no_param(_add_scenario)
 
 
-@app.route("/scenarios", methods=["PATCH"])
+@app.route("/scenarios", methods=["PUT"])
 def modify_scenario() -> flask.Response:
     return _try_for_exceptions_no_param(_modify_scenario)
 

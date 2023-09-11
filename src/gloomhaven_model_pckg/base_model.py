@@ -4,20 +4,13 @@ import peewee
 from .model_exception import GloomhavenModelException
 from pkg_resources import ensure_directory
 
-# TODO: Don't define the DB here
-database = peewee.MySQLDatabase(
-    "gloomhaven",
-    user="user",
-    password="password",
-    host="mysqldb",
-    port=3306,
-    autoconnect=False,
-)
+
+database_proxy = peewee.DatabaseProxy()
 
 
 class BaseModel(peewee.Model):
     class Meta:
-        database = database
+        database = database_proxy
 
     @classmethod
     def get(cls, *query, **filters):

@@ -1,5 +1,5 @@
 class DICT_CONST:
-    ID = "id"
+    ID = "_id"
     NAME = "name"
     TYPE = "type"
     COORDINATES = "coordinates"
