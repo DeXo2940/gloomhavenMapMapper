@@ -110,6 +110,7 @@ class ScenarioRepository:
             ScenarioModel.select()
             .join(RestrictionModel, peewee.JOIN.LEFT_OUTER)
             .where(where)
+            .order_by(ScenarioModel.id)
         )
 
     def _get_where_name_ilike(self, partial_name: str) -> peewee.Expression:

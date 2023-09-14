@@ -25,7 +25,7 @@ class AchievementRepository:
 
     def read(self) -> list[Achievement]:
         achievements = []
-        query = AchievementModel.select()
+        query = AchievementModel.select().order_by(AchievementModel.id)
         for achievement_model in query:
             achievement = self._get_from_model(achievement_model)
             achievements.append(achievement)
@@ -34,7 +34,11 @@ class AchievementRepository:
     def read_by_partial_name(self, partial_name: str) -> list[Achievement]:
         achievements = []
         search_name = f"%{partial_name}%"
-        query = AchievementModel.select().where(AchievementModel.name**search_name)
+        query = (
+            AchievementModel.select()
+            .where(AchievementModel.name**search_name)
+            .order_by(AchievementModel.id)
+        )
         for achievement_model in query:
             achievement = self._get_from_model(achievement_model)
             achievements.append(achievement)
