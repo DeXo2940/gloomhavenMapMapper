@@ -5,6 +5,10 @@ class Legend << (L, Orange) >>{
     +public_atribute: type_of_the_attribute
     -_private_atribute
     #private_atribute with getter only
+    ..for db models..
+    +$primary_key("primary_key")
+    +$foreign_key("foreign_key")
+    +$index("index")
     --
     +{static}static_method()
     ..//self// is ommited in methods..
@@ -13,4 +17,6 @@ class Legend << (L, Orange) >>{
     +method2($optional(optional_parameter))
     
     +{abstract}abstract_method()
+
+    
 }
