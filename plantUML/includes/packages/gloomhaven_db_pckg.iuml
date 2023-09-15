@@ -1,0 +1,31 @@
+!include ../common/procedures.iuml
+
+package peewee <<Node>> {
+    class Model <<peewee>> 
+    class DatabaseProxy <<peewee>>
+
+    hide <<peewee>> stereotype
+    hide <<peewee>> members
+}
+
+package gloomhaven_db_pckg{
+    struct DbOptions <<gloomhaven_db_pckg>>{
+        +port: str
+        +user: str
+        +password: str
+        +database: str
+        +host: str
+
+        +{static}create_from_environ() -> DbOptions
+        +has_all_data() -> bool
+    }
+
+    class DbInitializer <<gloomhaven_db_pckg>>{
+        +{static}initialize_database_proxy(db_options: DbOptions, database_proxy: peewee.DatabaseProxy, models: list[peewee.Model])
+    }
+    DbOptions <.. DbInitializer 
+    peewee.DatabaseProxy <..  DbInitializer 
+    peewee.Model <.. DbInitializer
+
+    hide <<gloomhaven_db_pckg>> stereotype
+}

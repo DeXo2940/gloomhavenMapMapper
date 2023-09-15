@@ -1,4 +1,3 @@
-
 !include ../common/procedures.iuml
 
 package peewee <<Node>> {

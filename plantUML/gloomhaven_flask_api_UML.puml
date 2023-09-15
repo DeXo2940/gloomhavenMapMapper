@@ -1,0 +1,10 @@
+@startuml GloomhavenApiUML
+    !include includes/common/skinparams.iuml
+
+    !include includes/gloomhaven_pckg_UML.iuml
+
+    !include includes/packages/gloomhaven_db_pckg.iuml
+    !include includes/packages/gloomhaven_api_pckg.iuml
+
+    gloomhaven_model_pckg -[hidden]- Legend
+@enduml

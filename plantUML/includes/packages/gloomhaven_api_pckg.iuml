@@ -1,0 +1,107 @@
+!include ../common/procedures.iuml
+
+package flask <<Node>>{
+    class Response<<flask>>
+    class Flask<<flask>>
+
+    hide <<flask>> stereotype
+    hide <<flask>> members
+}
+package gloomhaven_pckg{}
+
+package gloomhaven_api_pckg {
+    class RequestJson<<gloomhaven_api_pckg>>{
+        +{static}get_json_from_request
+    }
+    class SafeExecutioner<<gloomhaven_api_pckg>>{
+        +{static}execute_with_param(callable_method: Callable[[Any], flask.Response], param: Any) -> flask.Response
+        +{static}execute_no_param(callable_method: Callable[[], flask.Response]) -> flask.Response
+    }
+    flask.Response <.. SafeExecutioner
+
+    class ApiMethod<<gloomhaven_api_pckg>>{
+        #http_method: str
+        #callable_method: Callable
+        #endpoint_sufix: str
+        #parameters: str
+
+        +{static}create(http_method: str,callable_method: Callable, $optional(parameters): str, $optional(endpoint_sufix): str) -> ApiMethod
+    }
+
+    class GloomhavenApi<<gloomhaven_api_pckg>>{
+        +{abstract}get_endpoint() -> str
+        +{abstract}get_path() -> str
+        +{abstract}get_avaliable_methods -> list[ApiMethod]
+    }
+    ApiMethod <.. GloomhavenApi
+
+    class AchievemenGetApi<<gloomhaven_api_pckg>> implements GloomhavenApi{
+        -_repository: gloomhaven_pckg.AchievementRepository
+        +{static}create(achievement_repository: gloomhaven_pckg.AchievementRepository) -> AchievemenGetApi
+        $implementation()get_endpoint() -> str
+        $implementation()get_path() -> str
+        $implementation()get_avaliable_methods -> list[ApiMethod]
+        +get() -> flask.Response
+        +get_one(id: int) -> flask.Response
+    }
+    gloomhaven_pckg.AchievementRepository <.. AchievemenGetApi
+    flask.Response <.. AchievemenGetApi
+    SafeExecutioner <.. AchievemenGetApi
+
+    class AchievementApi<<gloomhaven_api_pckg>> extends AchievemenGetApi{
+        +{static}create(achievement_repository: AchievementRepository) -> AchievemenApi
+        $implementation()get_avaliable_methods -> list[ApiMethod]
+        +post() -> flask.Response
+        +put() -> flask.Response
+    }
+    RequestJson <.. AchievemenApi
+    
+    class ScenarioGetApi<<gloomhaven_api_pckg>> implements GloomhavenApi{
+        -_repository: gloomhaven_pckg.AchievementRepository
+        +{static}create(achievement_repository: gloomhaven_pckg.AchievementRepository) -> AchievemenGetApi
+        $implementation()get_endpoint() -> str
+        $implementation()get_path() -> str
+        $implementation()get_avaliable_methods -> list[ApiMethod]
+        +get() -> flask.Response
+        +get_one(id: int) -> flask.Response
+    }
+    gloomhaven_pckg.AchievementRepository <.. ScenarioGetApi
+    flask.Response <.. ScenarioGetApi
+    SafeExecutioner <.. ScenarioGetApi
+
+    class ScenarioApi<<gloomhaven_api_pckg>> extends ScenarioGetApi{
+        +{static}create(achievement_repository: AchievementRepository) -> AchievemenApi
+        $implementation()get_avaliable_methods -> list[ApiMethod]
+        +post() -> flask.Response
+        +put() -> flask.Response
+    }
+    RequestJson <.. ScenarioApi
+    
+    class GloomhavenApiFlaskWrapper<<gloomhaven_api_pckg>>{
+        -_database: peeeee.DatabaseProxy
+        -_apis: list[GloomhavenApi]
+        #app: flask.Flask
+        +{static}create(database: peewee.DatabaseProxy, callable_apis: list[GloomhavenApi]) -> GloomhavenApiFlaskWrapper
+    }
+    GloomhavenApi <.. GloomhavenApiFlaskWrapper
+    peewee.DatabaseProxy <.. GloomhavenApiFlaskWrapper
+    flask.Flask <.. GloomhavenApiFlaskWrapper
+
+' Exceptions
+    together {
+        exception GloomhavenApiException <<gloomhaven_api_pckg>>{
+            +message : str
+        }
+        $throws(class RequestJson, GloomhavenApiException)
+
+        SafeExecutioner ..> GloomhavenApiException : <<Excepts>>
+        SafeExecutioner ..> gloomhaven_pckg.GloomhavenException : <<Excepts>>
+
+        hide <<gloomhaven_api_pckg>> stereotype
+    }
+
+'     Restriction .. Scenario
+'     Restriction .. Achievement
+    
+    hide <<gloomhaven_api_pckg>> stereotype
+}
