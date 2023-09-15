@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Callable
 
-import flask
+from .http_method import HttpMethod
 
 
 class ApiMethod:
@@ -12,7 +12,7 @@ class ApiMethod:
 
     def __init__(
         self,
-        http_method: str,  # TODO should be an enum
+        http_method: HttpMethod,
         callable_method: Callable,
         parameters: str = "",
         endpoint_sufix: str = "",
@@ -24,7 +24,7 @@ class ApiMethod:
 
     @staticmethod
     def create(
-        http_method: str,
+        http_method: HttpMethod,
         callable_method: Callable,
         parameters: str = "",
         endpoint_sufix: str = "",
@@ -33,7 +33,7 @@ class ApiMethod:
 
     @property
     def http_method(self) -> str:
-        return self._http_method
+        return self._http_method.name
 
     @property
     def callable_method(self) -> Callable:
@@ -42,9 +42,9 @@ class ApiMethod:
     @property
     def endpoint_sufix(self) -> str:
         return (
-            f"_{self._http_method.lower()}"
+            f"_{self.http_method.lower()}"
             if self._endpoint_sufix == ""
-            else f"_{self._http_method.lower()}_{self._endpoint_sufix}"
+            else f"_{self.http_method.lower()}_{self._endpoint_sufix}"
         )
 
     @property

@@ -7,6 +7,7 @@ from .achievement_get_api import AchievemenGetApi
 from .safe_executioner import SafeExecutioner
 from .request_json import RequestJson
 from .api_method import ApiMethod
+from .http_method import HttpMethod
 
 
 class AchievemenApi(AchievemenGetApi):
@@ -18,8 +19,8 @@ class AchievemenApi(AchievemenGetApi):
         return AchievemenApi(achievement_repository)
 
     def get_avaliable_methods(self) -> list[ApiMethod]:
-        api_post_method = ApiMethod(ApiMethod.POST, self.post)
-        api_put_method = ApiMethod(ApiMethod.PUT, self.put)
+        api_post_method = ApiMethod(HttpMethod.POST, self.post)
+        api_put_method = ApiMethod(HttpMethod.PUT, self.put)
         return super().get_avaliable_methods() + [api_post_method, api_put_method]
 
     def post(self) -> flask.Response:

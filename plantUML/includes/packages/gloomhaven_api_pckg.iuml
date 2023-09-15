@@ -10,6 +10,13 @@ package flask <<Node>>{
 package gloomhaven_pckg{}
 
 package gloomhaven_api_pckg {
+    enum HttpMethod <<gloomhaven_api_pckg>>{
+        **GET**
+        **POST**
+        **PUT**
+        **DELETE**
+    }
+
     class RequestJson<<gloomhaven_api_pckg>>{
         +{static}get_json_from_request
     }
@@ -20,12 +27,12 @@ package gloomhaven_api_pckg {
     flask.Response <.. SafeExecutioner
 
     class ApiMethod<<gloomhaven_api_pckg>>{
-        #http_method: str
+        #http_method: HttpMethod
         #callable_method: Callable
         #endpoint_sufix: str
         #parameters: str
 
-        +{static}create(http_method: str,callable_method: Callable, $optional(parameters): str, $optional(endpoint_sufix): str) -> ApiMethod
+        +{static}create(http_method: HttpMethod,callable_method: Callable, $optional(parameters): str, $optional(endpoint_sufix): str) -> ApiMethod
     }
 
     class GloomhavenApi<<gloomhaven_api_pckg>>{

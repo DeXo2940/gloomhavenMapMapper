@@ -6,6 +6,7 @@ from gloomhaven_pckg import AchievementRepository
 from .safe_executioner import SafeExecutioner
 from .gloomhaven_api import GloomhavenApi
 from .api_method import ApiMethod
+from .http_method import HttpMethod
 
 
 class AchievemenGetApi(GloomhavenApi):
@@ -25,8 +26,8 @@ class AchievemenGetApi(GloomhavenApi):
         return f"/{AchievemenGetApi.ENDPOINT}"
 
     def get_avaliable_methods(self) -> list[ApiMethod]:
-        api_get_method = ApiMethod(ApiMethod.GET, self.get)
-        api_get_one_method = ApiMethod(ApiMethod.GET, self.get_one, "<int:id>", "one")
+        api_get_method = ApiMethod(HttpMethod.GET, self.get)
+        api_get_one_method = ApiMethod(HttpMethod.GET, self.get_one, "<int:id>", "one")
         return [api_get_method, api_get_one_method]
 
     def get(self) -> flask.Response:

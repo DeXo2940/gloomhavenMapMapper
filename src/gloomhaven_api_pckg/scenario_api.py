@@ -8,6 +8,7 @@ from .scenario_get_api import ScenarioGetApi
 from .safe_executioner import SafeExecutioner
 from .request_json import RequestJson
 from .api_method import ApiMethod
+from .http_method import HttpMethod
 
 
 class ScenarioApi(ScenarioGetApi):
@@ -25,8 +26,8 @@ class ScenarioApi(ScenarioGetApi):
         return SafeExecutioner.execute_no_param(self._modify_scenario)
 
     def get_avaliable_methods(self) -> list[ApiMethod]:
-        api_post_method = ApiMethod(ApiMethod.POST, self.post)
-        api_put_method = ApiMethod(ApiMethod.PUT, self.put)
+        api_post_method = ApiMethod(HttpMethod.POST, self.post)
+        api_put_method = ApiMethod(HttpMethod.PUT, self.put)
         return super().get_avaliable_methods() + [api_post_method, api_put_method]
 
     def _add_scenario(self) -> flask.Response:
