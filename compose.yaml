@@ -22,13 +22,13 @@ services:
     networks:
       - internal-only
 
-  gloom-api:
+  gloom-api-private:
     depends_on:
       - maria-db
-    image: gloomhavenmapmapper
+    image: gloomhavenmapmapper_priv
     build:
-      context: .
-      dockerfile: ./Dockerfile
+      context: ./backend
+      dockerfile: ./Dockerfile.priv
     environment:
       DB_DATABASE: gloomhaven
       DB_USER: user
@@ -37,6 +37,32 @@ services:
       DB_USE_LINK: true
     ports:
       - 5002:5002
+    links:
+      - maria-db:mysqldb
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 50M
+    networks:
+      - internal-only
+
+  gloom-api-public:
+    depends_on:
+      - maria-db
+    image: gloomhavenmapmapper_public
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile.public
+    environment:
+      DB_DATABASE: gloomhaven
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_PORT: 3306
+      DB_USE_LINK: true
+    ports:
+      - 5003:5002
     links:
       - maria-db:mysqldb
     restart: always
