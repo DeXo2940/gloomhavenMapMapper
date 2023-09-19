@@ -2,13 +2,18 @@ from __future__ import annotations
 import os
 import sys
 
+current_script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root_dir = os.path.dirname(current_script_dir)
+sys.path.append(project_root_dir)
 
-sys.path.append(os.path.dirname(__file__))
-
-from gloomhaven_model_pckg import database_proxy, MODELS
-from gloomhaven_db_pckg import DbOptions, DbInitializer
-from gloomhaven_pckg import AchievementRepository, ScenarioRepository
-from gloomhaven_api_pckg import AchievemenApi, ScenarioApi, GloomhavenApiFlaskWrapper
+from src.gloomhaven_model_pckg import database_proxy, MODELS
+from src.gloomhaven_db_pckg import DbOptions, DbInitializer
+from src.gloomhaven_pckg import AchievementRepository, ScenarioRepository
+from src.gloomhaven_api_pckg import (
+    AchievemenApi,
+    ScenarioApi,
+    GloomhavenApiFlaskWrapper,
+)
 
 
 db_options = DbOptions.create_from_environ()

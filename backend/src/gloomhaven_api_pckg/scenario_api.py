@@ -2,7 +2,7 @@ from __future__ import annotations
 import flask
 
 
-from gloomhaven_pckg import Scenario, ScenarioRepository
+from ..gloomhaven_pckg import Scenario, ScenarioRepository
 
 from .scenario_get_api import ScenarioGetApi
 from .safe_executioner import SafeExecutioner

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any, Callable
 import flask
 
-from gloomhaven_pckg import GloomhavenException
+from ..gloomhaven_pckg import GloomhavenException
 from .gloomhaven_api_exception import GloomhavenApiException
 
 

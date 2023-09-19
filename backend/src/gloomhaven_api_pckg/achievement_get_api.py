@@ -1,7 +1,7 @@
 from __future__ import annotations
 import flask
 
-from gloomhaven_pckg import AchievementRepository
+from ..gloomhaven_pckg import AchievementRepository
 
 from .safe_executioner import SafeExecutioner
 from .gloomhaven_api import GloomhavenApi

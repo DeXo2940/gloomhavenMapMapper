@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Callable
+from typing import Any
 import flask
 
 from .gloomhaven_api_exception import GloomhavenApiException
