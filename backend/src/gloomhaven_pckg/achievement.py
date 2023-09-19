@@ -19,7 +19,6 @@ class Achievement:
         self.type = type
 
     @staticmethod
-    @lru_cache(maxsize=None)
     def create(name: str, type: AchievementType, id: int | None = None) -> Achievement:
         return Achievement(id, name, type)
 
@@ -30,7 +29,7 @@ class Achievement:
         type_name = achievement_dict.get(DICT_CONST.TYPE)
         if name is None or type_name is None:
             raise AchievementException("Incorrect values for Achievement creation")
-        achievement_type = AchievementType[type_name]
+        achievement_type = AchievementType.get(type_name)
         return Achievement.create(name, achievement_type, id)
 
     @staticmethod

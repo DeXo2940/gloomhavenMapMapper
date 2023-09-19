@@ -1,7 +1,7 @@
 from __future__ import annotations
 from functools import lru_cache
 
-from gloomhaven_model_pckg import (
+from ..gloomhaven_model_pckg import (
     Achievement as AchievementModel,
     GloomhavenModelException,
 )
@@ -76,8 +76,8 @@ class AchievementRepository:
         return AchievementModel(type=type_name, name=name, id=id)
 
     def _get_from_model(self, achievement_model: AchievementModel) -> Achievement:
-        id = achievement_model.id
-        name = achievement_model.name
+        id = int(str(achievement_model.id))
+        name = str(achievement_model.name)
         type_name = str(achievement_model.type)
-        achievement_type = AchievementType[type_name]
+        achievement_type = AchievementType.get(type_name)
         return Achievement.create(name, achievement_type, id)

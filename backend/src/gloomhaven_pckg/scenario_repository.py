@@ -3,7 +3,7 @@ from functools import lru_cache
 
 import peewee
 
-from gloomhaven_model_pckg import (
+from ..gloomhaven_model_pckg import (
     Scenario as ScenarioModel,
     Restriction as RestrictionModel,
     Achievement as AchievementModel,
@@ -22,14 +22,6 @@ class ScenarioRepository:
     @staticmethod
     def get_instance() -> ScenarioRepository:
         return ScenarioRepository()
-
-    @property
-    def language(self) -> str:
-        return self._language
-
-    @language.setter
-    def language(self, language: str) -> None:
-        self._language = language
 
     def create(self, scenario: Scenario) -> Scenario:
         scenario_model = self._get_scenario_model(scenario)
@@ -164,7 +156,7 @@ class ScenarioRepository:
     def _get_scenario_from_model(self, scenario_model: ScenarioModel) -> Scenario:
         id = int(str(scenario_model.id))
         name = str(scenario_model.name)
-        scenario_model_coordinates = scenario_model.coordinates
+        scenario_model_coordinates = str(scenario_model.coordinates)
         coordinates = Coordinates.create_by_string(scenario_model_coordinates)
         return Scenario.create(id, coordinates, name)
 
@@ -192,10 +184,10 @@ class ScenarioRepository:
     def _get_achievement_from_model(
         self, achievement_model: AchievementModel | peewee.ForeignKeyField
     ) -> Achievement:
-        id = achievement_model.id
-        name = achievement_model.name
+        id = int(str(achievement_model.id))
+        name = str(achievement_model.name)
         type_name = str(achievement_model.type)
-        achievement_type = AchievementType[type_name]
+        achievement_type = AchievementType.get(type_name)
         return Achievement.create(name, achievement_type, id)
 
     def _try_to_save_restrictions(

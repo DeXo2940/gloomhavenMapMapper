@@ -8,12 +8,10 @@ class Coordinates:
         self.x = x
         self.y = y
 
-    @lru_cache(maxsize=None)
     @staticmethod
     def create(x: str, y: int) -> Coordinates:
         return Coordinates(x, y)
 
-    @lru_cache(maxsize=None)
     @staticmethod
     def create_by_string(coordinates: str) -> Coordinates:
         splited: list[str] = coordinates.split("-")

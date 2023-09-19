@@ -19,7 +19,6 @@ class Restriction:
         self.level = level
 
     @staticmethod
-    @lru_cache(maxsize=None)
     def create(
         achievement: Achievement, is_done: bool, level: int | None = None
     ) -> Restriction:
