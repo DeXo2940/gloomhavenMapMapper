@@ -1,5 +1,6 @@
 from __future__ import annotations
 from functools import lru_cache
+import peewee
 
 from ..gloomhaven_model_pckg import (
     Achievement as AchievementModel,
@@ -19,8 +20,12 @@ class AchievementRepository:
 
     def create(self, achievement: Achievement) -> Achievement:
         achievement_model = self._get_model(achievement)
-        achievement_model.save(True)
-
+        try:
+            achievement_model.save(True)
+        except peewee.IntegrityError:
+            raise AchievementException(
+                f"Achievement id=`{achievement.id}` already exists"
+            )
         return self._get_from_model(achievement_model)
 
     def read(self) -> list[Achievement]:
