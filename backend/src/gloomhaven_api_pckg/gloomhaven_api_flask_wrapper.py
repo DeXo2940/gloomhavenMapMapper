@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import flask
+import flask_cors
 import peewee
 import uuid
 
@@ -31,6 +32,7 @@ class GloomhavenApiFlaskWrapper:
     def _init_app(self) -> None:
         self._app = flask.Flask(__name__)
         self._app.secret_key = str(uuid.uuid4())
+        flask_cors.CORS(self._app)
         print(__name__)
 
     def _register_routes(self) -> None:
