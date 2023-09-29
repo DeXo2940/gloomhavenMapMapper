@@ -1,0 +1,1 @@
+export const scenarioUrl = 'http://localhost:5000/scenarios'
