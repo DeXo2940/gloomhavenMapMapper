@@ -6,7 +6,10 @@ import Scenario from '../../types/scenario';
 import { List, ListItemButton, ListItemText } from '@mui/material';
 import { scenarioUrl, scenarioUrlSufix, scenarioUrlSufixId } from '../../config/config';
 
+import { useScenarioContext } from './ScenarioContext';
+
 const ScenarioList: React.FC = () => {
+    const { setSelectedScenarioId } = useScenarioContext();
     const [scenarios, setScenarios] = useState<Scenario[]>([]);
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     const navigate = useNavigate();
@@ -25,8 +28,8 @@ const ScenarioList: React.FC = () => {
         event: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number, id: number
     ) => {
         setSelectedIndex(index);
-        //TODO navigate is temporary - it will modify the id on the main MasterDetail layout screen
-        navigate(scenarioUrlSufixId(id))
+        setSelectedScenarioId(id.toString());
+        // navigate(scenarioUrlSufixId(id))
     };
 
     return (

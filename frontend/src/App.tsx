@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // As
 import ScenarioList from './components/ScenarioScreen/ScenarioList';
 import ScenarioDetails from './components/ScenarioScreen/ScenarioDetails';
 import ScenarioForm from './components/ScenarioScreen/ScenarioForm';
-import ScenarioLayout from './components/ScenarioMasteDetailLayout';
+import ScenarioLayout from './components/ScenarioMasterDetailLayout';
 
 import { scenarioUrlSufix, scenarioUrlSufixId, scenarioUrlSufixIdTemplate } from './config/config'
 

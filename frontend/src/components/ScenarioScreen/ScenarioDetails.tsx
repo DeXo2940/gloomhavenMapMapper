@@ -12,16 +12,20 @@ import ScenarioGrid from './ScenarioGrid';
 import { scenarioUrl } from '../../config/config';
 import GridAdditionalElement from '../../types/gridAdditionalElement';
 
+import { useScenarioContext } from './ScenarioContext';
+
 const ScenarioDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const { selectedScenarioId } = useScenarioContext();
     const [scenario, setScenario] = useState<Scenario>();
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get<Scenario>(scenarioUrl + `/${id}`)
+        axios
+            .get<Scenario>(scenarioUrl + `/${selectedScenarioId}`)
             .then((response) => setScenario(response.data))
             .catch((error) => console.error('Error fetching scenario details:', error));
-    }, [id]);
+    }, [selectedScenarioId]);
 
     const handleEditNavigation = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,13 +41,12 @@ const ScenarioDetails: React.FC = () => {
 
     const spacer_element: GridAdditionalElement = { element: <></>, xs: 7 }
     const edit_button_element = { element: <Button variant="contained" startIcon={<EditIcon />} onClick={handleEditNavigation} fullWidth>Edit</Button>, xs: 1 }
-    const element_list = [spacer_element, edit_button_element]
 
     return (
         <Box>
             <h1>Scenario </h1>
             {scenario ? (
-                <ScenarioGrid scenario={scenario} additionalElements={element_list} />
+                <ScenarioGrid scenario={scenario} additionalElements={[spacer_element, edit_button_element]} />
             ) : (
                 <p>Loading...</p>
             )
